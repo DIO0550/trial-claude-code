@@ -1,0 +1,1 @@
+export type StoneColor = "black" | "white" | null;
