@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "prompt-mcp-server": {
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "prompt-mcp-server",
+        "node",
+        "/workspace/McpServer/dist/server.js"
+      ]
+    }
+  }
+}
