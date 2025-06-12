@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import Stone from "../Stone/Stone";
+import DifficultySelector from "../DifficultySelector/DifficultySelector";
 import { StoneColor } from "../../types/stone";
 import { DifficultyLevel } from "../../types/difficulty";
 
-interface StartScreenProps {
+interface Props {
   onStartGame: (difficulty: DifficultyLevel, color: StoneColor) => void;
 }
 
-const StartScreen = ({ onStartGame }: StartScreenProps) => {
+const StartScreen = ({ onStartGame }: Props) => {
   const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel>("medium");
   const [selectedColor, setSelectedColor] = useState<StoneColor>("black");
 
@@ -25,35 +26,10 @@ const StartScreen = ({ onStartGame }: StartScreenProps) => {
         </h1>
         
         <div className="space-y-6">
-          <div>
-            <h2 className="text-lg font-semibold mb-3 text-gray-700">
-              CPU の強さを選択
-            </h2>
-            <div className="space-y-2">
-              {[
-                { value: "beginner", label: "入門", description: "ほぼランダム配置" },
-                { value: "easy", label: "やさしい", description: "基本的な防御重視" },
-                { value: "medium", label: "ふつう", description: "攻撃と防御のバランス" },
-                { value: "hard", label: "むずかしい", description: "攻撃重視・3手先読み" },
-                { value: "expert", label: "エキスパート", description: "最高レベル・5手先読み" }
-              ].map((option) => (
-                <label key={option.value} className="flex items-start cursor-pointer p-2 rounded hover:bg-gray-50">
-                  <input
-                    type="radio"
-                    name="difficulty"
-                    value={option.value}
-                    checked={selectedDifficulty === option.value}
-                    onChange={(e) => setSelectedDifficulty(e.target.value as DifficultyLevel)}
-                    className="mr-3 mt-1 text-blue-600"
-                  />
-                  <div>
-                    <div className="text-gray-700 font-medium">{option.label}</div>
-                    <div className="text-sm text-gray-500">{option.description}</div>
-                  </div>
-                </label>
-              ))}
-            </div>
-          </div>
+          <DifficultySelector
+            selectedDifficulty={selectedDifficulty}
+            onDifficultyChange={setSelectedDifficulty}
+          />
 
           <div>
             <h2 className="text-lg font-semibold mb-3 text-gray-700">

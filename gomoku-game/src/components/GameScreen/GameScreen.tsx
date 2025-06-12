@@ -4,13 +4,13 @@ import Stone from "../Stone/Stone";
 import { StoneColor } from "../../types/stone";
 import { DifficultyLevel } from "../../types/difficulty";
 
-interface GameScreenProps {
+interface Props {
   difficulty: DifficultyLevel;
   playerColor: StoneColor;
   onBackToStart: () => void;
 }
 
-const GameScreen = ({ difficulty, playerColor, onBackToStart }: GameScreenProps) => {
+const GameScreen = ({ difficulty, playerColor, onBackToStart }: Props) => {
   const difficultyLabels = {
     beginner: "入門",
     easy: "やさしい", 

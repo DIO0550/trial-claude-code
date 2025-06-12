@@ -1,11 +1,11 @@
 import { JSX } from "react";
 import { StoneColor } from "../../types/stone";
 
-interface StoneProps {
+interface Props {
   color: StoneColor;
 }
 
-const Stone = ({ color }: StoneProps): JSX.Element => {
+const Stone = ({ color }: Props): JSX.Element => {
   if (StoneColor.isNone(color)) {
     return <div className="stone stone-empty" />;
   }
