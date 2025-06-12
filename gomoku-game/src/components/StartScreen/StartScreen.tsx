@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Stone from "./Stone";
-import { StoneColor } from "../types/stone";
-
-type DifficultyLevel = "beginner" | "easy" | "medium" | "hard" | "expert";
+import Stone from "../Stone/Stone";
+import { StoneColor } from "../../types/stone";
+import { DifficultyLevel } from "../../types/difficulty";
 
 interface StartScreenProps {
   onStartGame: (difficulty: DifficultyLevel, color: StoneColor) => void;

@@ -1,9 +1,8 @@
 "use client";
 
-import Stone from "./Stone";
-import { StoneColor } from "../types/stone";
-
-type DifficultyLevel = "beginner" | "easy" | "medium" | "hard" | "expert";
+import Stone from "../Stone/Stone";
+import { StoneColor } from "../../types/stone";
+import { DifficultyLevel } from "../../types/difficulty";
 
 interface GameScreenProps {
   difficulty: DifficultyLevel;
