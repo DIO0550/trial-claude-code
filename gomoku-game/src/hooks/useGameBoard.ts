@@ -17,7 +17,7 @@ export const useGameBoard = (): UseGameBoardReturn => {
       return false;
     }
 
-    if (board[row][col] !== null) {
+    if (board[row][col] !== "none") {
       return false;
     }
 
@@ -36,7 +36,7 @@ export const useGameBoard = (): UseGameBoardReturn => {
 
   const getStone = useCallback((row: number, col: number): StoneColor => {
     if (!Board.isValidPosition(row, col)) {
-      return null;
+      return "none";
     }
     return board[row][col];
   }, [board]);

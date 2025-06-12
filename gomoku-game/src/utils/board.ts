@@ -4,7 +4,7 @@ export type Board = (StoneColor)[][];
 
 export const Board = {
   createEmpty: (): Board => {
-    return Array.from({ length: 15 }, () => Array.from({ length: 15 }, () => null));
+    return Array.from({ length: 15 }, () => Array.from({ length: 15 }, () => "none"));
   },
 
   isValidPosition: (row: number, col: number): boolean => {

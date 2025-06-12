@@ -9,10 +9,10 @@ describe("Board", () => {
       expect(board).toHaveLength(15);
       expect(board[0]).toHaveLength(15);
       
-      // 全てのセルがnullで初期化されていることを確認
+      // 全てのセルが"none"で初期化されていることを確認
       for (let row = 0; row < 15; row++) {
         for (let col = 0; col < 15; col++) {
-          expect(board[row][col]).toBe(null);
+          expect(board[row][col]).toBe("none");
         }
       }
     });

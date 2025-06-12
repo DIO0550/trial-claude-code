@@ -10,10 +10,10 @@ describe("useGameBoard", () => {
       expect(result.current.board).toHaveLength(15);
       expect(result.current.board[0]).toHaveLength(15);
 
-      // 全てのセルがnullで初期化されていることを確認
+      // 全てのセルが"none"で初期化されていることを確認
       for (let row = 0; row < 15; row++) {
         for (let col = 0; col < 15; col++) {
-          expect(result.current.board[row][col]).toBe(null);
+          expect(result.current.board[row][col]).toBe("none");
         }
       }
     });
@@ -85,16 +85,16 @@ describe("useGameBoard", () => {
 
       expect(result.current.getStone(3, 5)).toBe("black");
       expect(result.current.getStone(10, 12)).toBe("white");
-      expect(result.current.getStone(0, 0)).toBe(null);
+      expect(result.current.getStone(0, 0)).toBe("none");
     });
 
-    it("範囲外の座標はnullを返す", () => {
+    it("範囲外の座標は\"none\"を返す", () => {
       const { result } = renderHook(() => useGameBoard());
 
-      expect(result.current.getStone(-1, 0)).toBe(null);
-      expect(result.current.getStone(0, -1)).toBe(null);
-      expect(result.current.getStone(15, 0)).toBe(null);
-      expect(result.current.getStone(0, 15)).toBe(null);
+      expect(result.current.getStone(-1, 0)).toBe("none");
+      expect(result.current.getStone(0, -1)).toBe("none");
+      expect(result.current.getStone(15, 0)).toBe("none");
+      expect(result.current.getStone(0, 15)).toBe("none");
     });
   });
 
@@ -114,10 +114,10 @@ describe("useGameBoard", () => {
         result.current.resetBoard();
       });
 
-      // 全てのセルがnullになっていることを確認
+      // 全てのセルが"none"になっていることを確認
       for (let row = 0; row < 15; row++) {
         for (let col = 0; col < 15; col++) {
-          expect(result.current.board[row][col]).toBe(null);
+          expect(result.current.board[row][col]).toBe("none");
         }
       }
     });

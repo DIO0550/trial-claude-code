@@ -6,7 +6,7 @@ interface StoneProps {
 }
 
 const Stone = ({ color }: StoneProps): JSX.Element => {
-  if (!color) {
+  if (StoneColor.isNone(color)) {
     return <div className="stone stone-empty" />;
   }
 
