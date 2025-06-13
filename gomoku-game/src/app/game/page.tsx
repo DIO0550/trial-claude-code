@@ -2,9 +2,9 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import GameScreen from "../../components/GameScreen/GameScreen";
-import { StoneColor } from "../../types/stone";
-import { DifficultyLevel } from "../../types/difficulty";
+import GameScreen from "@/components/GameScreen/GameScreen";
+import { StoneColor } from "@/types/stone";
+import { DifficultyLevel } from "@/types/difficulty";
 
 function GamePageContent() {
   const router = useRouter();

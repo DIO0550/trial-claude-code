@@ -1,5 +1,5 @@
 import { JSX } from "react";
-import { DifficultyLevel } from "../../types/difficulty";
+import { DifficultyLevel } from "@/types/difficulty";
 
 interface Props {
   selectedDifficulty: DifficultyLevel;

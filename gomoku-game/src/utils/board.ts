@@ -1,4 +1,4 @@
-import { StoneColor } from "../types/stone";
+import { StoneColor } from "@/types/stone";
 
 export type Board = (StoneColor)[][];
 

@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import StartScreen from "../../components/StartScreen/StartScreen";
-import { StoneColor } from "../../types/stone";
-import { DifficultyLevel } from "../../types/difficulty";
+import StartScreen from "@/components/StartScreen/StartScreen";
+import { StoneColor } from "@/types/stone";
+import { DifficultyLevel } from "@/types/difficulty";
 
 export default function StartPage() {
   const router = useRouter();

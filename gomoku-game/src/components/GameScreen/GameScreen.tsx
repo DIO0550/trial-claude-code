@@ -1,8 +1,8 @@
 "use client";
 
-import Stone from "../Stone/Stone";
-import { StoneColor } from "../../types/stone";
-import { DifficultyLevel } from "../../types/difficulty";
+import Stone from "@/components/Stone/Stone";
+import { StoneColor } from "@/types/stone";
+import { DifficultyLevel } from "@/types/difficulty";
 
 interface Props {
   difficulty: DifficultyLevel;

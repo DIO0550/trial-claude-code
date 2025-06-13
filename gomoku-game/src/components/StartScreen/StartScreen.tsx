@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import DifficultySelector from "../DifficultySelector/DifficultySelector";
-import ColorSelector from "../ColorSelector/ColorSelector";
-import { StoneColor } from "../../types/stone";
-import { DifficultyLevel } from "../../types/difficulty";
+import DifficultySelector from "@/components/DifficultySelector/DifficultySelector";
+import ColorSelector from "@/components/ColorSelector/ColorSelector";
+import { StoneColor } from "@/types/stone";
+import { DifficultyLevel } from "@/types/difficulty";
 
 interface Props {
   onStartGame: (difficulty: DifficultyLevel, color: StoneColor) => void;
