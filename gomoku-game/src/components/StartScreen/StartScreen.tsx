@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Stone from "../Stone/Stone";
 import DifficultySelector from "../DifficultySelector/DifficultySelector";
+import ColorSelector from "../ColorSelector/ColorSelector";
 import { StoneColor } from "../../types/stone";
 import { DifficultyLevel } from "../../types/difficulty";
 
@@ -12,10 +12,13 @@ interface Props {
 
 const StartScreen = ({ onStartGame }: Props) => {
   const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel>("medium");
-  const [selectedColor, setSelectedColor] = useState<StoneColor>("black");
+  const [selectedColor, setSelectedColor] = useState<StoneColor | "random">("black");
 
   const handleStartGame = () => {
-    onStartGame(selectedDifficulty, selectedColor);
+    const finalColor = selectedColor === "random" 
+      ? Math.random() < 0.5 ? "black" : "white"
+      : selectedColor;
+    onStartGame(selectedDifficulty, finalColor);
   };
 
   return (
@@ -31,32 +34,10 @@ const StartScreen = ({ onStartGame }: Props) => {
             onDifficultyChange={setSelectedDifficulty}
           />
 
-          <div>
-            <h2 className="text-lg font-semibold mb-3 text-gray-700">
-              あなたの石の色を選択
-            </h2>
-            <div className="flex space-x-4">
-              {[
-                { value: "black", label: "黒（先手）" },
-                { value: "white", label: "白（後手）" }
-              ].map((option) => (
-                <label key={option.value} className="flex items-center cursor-pointer">
-                  <input
-                    type="radio"
-                    name="color"
-                    value={option.value}
-                    checked={selectedColor === option.value}
-                    onChange={(e) => setSelectedColor(e.target.value as StoneColor)}
-                    className="mr-2 text-blue-600"
-                  />
-                  <div className="flex items-center space-x-2">
-                    <Stone color={option.value as StoneColor} />
-                    <span className="text-gray-700">{option.label}</span>
-                  </div>
-                </label>
-              ))}
-            </div>
-          </div>
+          <ColorSelector
+            selectedColor={selectedColor}
+            onColorChange={setSelectedColor}
+          />
 
           <button
             onClick={handleStartGame}
