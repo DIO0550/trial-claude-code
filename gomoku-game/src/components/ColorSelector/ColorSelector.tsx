@@ -2,37 +2,43 @@
 
 import Stone from "@/components/Stone/Stone";
 import { StoneColor } from "@/types/stone";
+import { ColorSelection } from "@/types/colorSelection";
 import { JSX } from "react";
 
 interface Props {
-  selectedColor: StoneColor | "random";
-  onColorChange: (color: StoneColor | "random") => void;
+  selectedColor: ColorSelection;
+  onColorChange: (color: ColorSelection) => void;
 }
 
 const ColorSelector = ({
   selectedColor,
   onColorChange,
 }: Props): JSX.Element => {
-  const colorOptions = [
+  const colorOptions: Array<{
+    value: ColorSelection;
+    label: string;
+    description: string;
+    hasStone: boolean;
+  }> = [
     {
       value: "black",
-      label: "黒（先手）",
-      description: "最初に石を置きます",
+      label: ColorSelection.getLabel("black"),
+      description: ColorSelection.getDescription("black"),
       hasStone: true,
     },
     {
       value: "white",
-      label: "白（後手）",
-      description: "相手の後に石を置きます",
+      label: ColorSelection.getLabel("white"),
+      description: ColorSelection.getDescription("white"),
       hasStone: true,
     },
     {
       value: "random",
-      label: "ランダム",
-      description: "ゲーム開始時に色が決まります",
+      label: ColorSelection.getLabel("random"),
+      description: ColorSelection.getDescription("random"),
       hasStone: false,
     },
-  ] as const;
+  ];
 
   return (
     <div>
@@ -43,7 +49,7 @@ const ColorSelector = ({
         {colorOptions.map((option) => (
           <div
             key={option.value}
-            onClick={() => onColorChange(option.value as StoneColor | "random")}
+            onClick={() => onColorChange(option.value)}
             className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 select-none ${
               selectedColor === option.value
                 ? "border-blue-600 bg-blue-100 shadow-lg ring-4 ring-blue-300"

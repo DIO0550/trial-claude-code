@@ -4,6 +4,7 @@ import { useState } from "react";
 import DifficultySelector from "@/components/DifficultySelector/DifficultySelector";
 import ColorSelector from "@/components/ColorSelector/ColorSelector";
 import { StoneColor } from "@/types/stone";
+import { ColorSelection } from "@/types/colorSelection";
 import { DifficultyLevel } from "@/types/difficulty";
 
 interface Props {
@@ -12,12 +13,10 @@ interface Props {
 
 const StartScreen = ({ onStartGame }: Props) => {
   const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel>("medium");
-  const [selectedColor, setSelectedColor] = useState<StoneColor | "random">("black");
+  const [selectedColor, setSelectedColor] = useState<ColorSelection>("black");
 
   const handleStartGame = () => {
-    const finalColor = selectedColor === "random" 
-      ? Math.random() < 0.5 ? "black" : "white"
-      : selectedColor;
+    const finalColor = ColorSelection.resolveColor(selectedColor);
     onStartGame(selectedDifficulty, finalColor);
   };
 
