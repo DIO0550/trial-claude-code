@@ -47,6 +47,13 @@ cd gomoku-game/
 - `interface` for objects, `type` for primitives/unions
 - Early return patterns to reduce nesting
 
+### Programming Patterns
+
+- **No classes**: Use function-based approaches and factory functions instead of ES6 classes
+- Prefer functional programming patterns over object-oriented patterns
+- Use factory functions for creating objects with behavior
+- Leverage TypeScript interfaces for type contracts
+
 ### Current Game Implementation
 
 - `StoneColor` type: `"black" | "white" | null`
