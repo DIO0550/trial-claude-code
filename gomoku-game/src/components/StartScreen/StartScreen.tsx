@@ -6,12 +6,13 @@ import ColorSelector from "@/components/ColorSelector/ColorSelector";
 import { StoneColor } from "@/types/stone";
 import { ColorSelection } from "@/types/colorSelection";
 import { DifficultyLevel } from "@/types/difficulty";
+import { JSX } from "react";
 
 interface Props {
   onStartGame: (difficulty: DifficultyLevel, color: StoneColor) => void;
 }
 
-const StartScreen = ({ onStartGame }: Props) => {
+const StartScreen = ({ onStartGame }: Props): JSX.Element => {
   const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel>("medium");
   const [selectedColor, setSelectedColor] = useState<ColorSelection>("black");
 

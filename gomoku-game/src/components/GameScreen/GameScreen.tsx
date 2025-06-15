@@ -3,6 +3,7 @@
 import Stone from "@/components/Stone/Stone";
 import { StoneColor } from "@/types/stone";
 import { DifficultyLevel } from "@/types/difficulty";
+import { JSX } from "react";
 
 interface Props {
   difficulty: DifficultyLevel;
@@ -10,7 +11,7 @@ interface Props {
   onBackToStart: () => void;
 }
 
-const GameScreen = ({ difficulty, playerColor, onBackToStart }: Props) => {
+const GameScreen = ({ difficulty, playerColor, onBackToStart }: Props): JSX.Element => {
   const difficultyLabels = {
     beginner: "入門",
     easy: "やさしい", 

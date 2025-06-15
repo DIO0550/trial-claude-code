@@ -79,18 +79,65 @@ From project conventions:
 - Object parameters for functions with 4+ arguments
 - JSDoc comments for non-obvious functions
 
+### ディレクトリ構造
+
+```text
+/
+├ next.config.js
+├ tsconfig.json
+├ package.json
+├ .env.example
+├ prisma/                  # Prisma管理のDBスキーマ
+│  └ schema.prisma
+├ public/
+│  └ swagger/             # Swagger UI静的ファイル
+│     └ swagger.json
+└ src/
+   ├ app/                 # Next.js App Routerルート
+   │  ├ api/              # APIエンドポイント（REST/GraphQL/OpenAPI）
+   │  │  ├ graphql/
+   │  │  │  └ route.ts
+   │  │  ├ openapi/
+   │  │  │  └ route.ts
+   │  │  └ …               # 追加のREST APIハンドラ（route.ts）
+   │  ├ layout.tsx
+   │  └ page.tsx           # トップレベルページ
+   ├ components/           # UIコンポーネント
+   │  ├ elements/
+   │  │  └ buttons/
+   │  │     └ button.tsx
+   │  └ layouts/
+   │     └ headers/
+   │        └ header.tsx
+   ├ features/             # ドメイン別機能モジュール
+   │  └ cpu/
+   │     ├ components/
+   │     ├ hooks/
+   │     ├ types/
+   │     └ utils/
+   ├ hooks/                # 全体共通カスタムフック
+   ├ libs/                 # 共有ライブラリ（GraphQL/OpenAPIクライアント）
+   │  ├ graphql/
+   │  │  ├ schema.ts
+   │  │  └ resolvers.ts
+   │  └ openapi/
+   ├ types/                # グローバル型定義
+   └ utils/                # 共有ユーティリティ関数
+```
+
 ## Reference Documentation
 
-プロジェクトの開発において、以下のフォルダ内のmarkdownファイルを参考にしてください：
+プロジェクトの開発において、以下のフォルダ内の markdown ファイルを参考にしてください：
 
-- **react/**: React開発に関するベストプラクティスやプロンプトファイル
+- **react/**: React 開発に関するベストプラクティスやプロンプトファイル
+
   - `component.prompt.md`: コンポーネント作成ガイド
   - `custom-hook.prompt.md`: カスタムフック開発ガイド
-  - `tdd.prompt.md`: TDD開発手法
-  - `vitest.prompt.md`: Vitestテストガイド
+  - `tdd.prompt.md`: TDD 開発手法
+  - `vitest.prompt.md`: Vitest テストガイド
   - `standard.prompt.md`: 標準的な開発パターン
   - `comment.prompt.md`: コメント記述ガイド
-  - `copilot-instructions.md`: Copilot使用時の指示
+  - `copilot-instructions.md`: Copilot 使用時の指示
 
 - **general/**: 一般的な開発ガイドライン
   - `commit.prompt.md`: コミットメッセージのガイド
