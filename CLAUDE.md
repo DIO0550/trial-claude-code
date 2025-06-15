@@ -78,3 +78,19 @@ From project conventions:
 - Accessibility with aria attributes and semantic HTML
 - Object parameters for functions with 4+ arguments
 - JSDoc comments for non-obvious functions
+
+## Reference Documentation
+
+プロジェクトの開発において、以下のフォルダ内のmarkdownファイルを参考にしてください：
+
+- **react/**: React開発に関するベストプラクティスやプロンプトファイル
+  - `component.prompt.md`: コンポーネント作成ガイド
+  - `custom-hook.prompt.md`: カスタムフック開発ガイド
+  - `tdd.prompt.md`: TDD開発手法
+  - `vitest.prompt.md`: Vitestテストガイド
+  - `standard.prompt.md`: 標準的な開発パターン
+  - `comment.prompt.md`: コメント記述ガイド
+  - `copilot-instructions.md`: Copilot使用時の指示
+
+- **general/**: 一般的な開発ガイドライン
+  - `commit.prompt.md`: コミットメッセージのガイド
