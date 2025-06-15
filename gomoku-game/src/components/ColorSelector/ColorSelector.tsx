@@ -5,40 +5,43 @@ import { StoneColor } from "@/types/stone";
 import { ColorSelection } from "@/types/colorSelection";
 import { JSX } from "react";
 
+interface ColorOption {
+  value: ColorSelection;
+  label: string;
+  description: string;
+  hasStone: boolean;
+}
+
 interface Props {
   selectedColor: ColorSelection;
   onColorChange: (color: ColorSelection) => void;
 }
 
+const COLOR_OPTIONS: ColorOption[] = [
+  {
+    value: "black",
+    label: ColorSelection.getLabel("black"),
+    description: ColorSelection.getDescription("black"),
+    hasStone: true,
+  },
+  {
+    value: "white",
+    label: ColorSelection.getLabel("white"),
+    description: ColorSelection.getDescription("white"),
+    hasStone: true,
+  },
+  {
+    value: "random",
+    label: ColorSelection.getLabel("random"),
+    description: ColorSelection.getDescription("random"),
+    hasStone: false,
+  },
+];
+
 const ColorSelector = ({
   selectedColor,
   onColorChange,
 }: Props): JSX.Element => {
-  const colorOptions: Array<{
-    value: ColorSelection;
-    label: string;
-    description: string;
-    hasStone: boolean;
-  }> = [
-    {
-      value: "black",
-      label: ColorSelection.getLabel("black"),
-      description: ColorSelection.getDescription("black"),
-      hasStone: true,
-    },
-    {
-      value: "white",
-      label: ColorSelection.getLabel("white"),
-      description: ColorSelection.getDescription("white"),
-      hasStone: true,
-    },
-    {
-      value: "random",
-      label: ColorSelection.getLabel("random"),
-      description: ColorSelection.getDescription("random"),
-      hasStone: false,
-    },
-  ];
 
   return (
     <div>
@@ -46,7 +49,7 @@ const ColorSelector = ({
         あなたの石の色を選択
       </h2>
       <div className="space-y-3">
-        {colorOptions.map((option) => (
+        {COLOR_OPTIONS.map((option) => (
           <div
             key={option.value}
             onClick={() => onColorChange(option.value)}
