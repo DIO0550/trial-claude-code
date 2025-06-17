@@ -21,7 +21,7 @@ const getAvailablePositions = (board: Board): Position[] => {
 export const createBeginnerCpuPlayer = (color: StoneColor): CpuPlayer => ({
   difficulty: "beginner",
   color,
-  calculateNextMove: (board: Board, moveHistory: Position[]): Position | null => {
+  calculateNextMove: (board: Board): Position | null => {
     const availablePositions = getAvailablePositions(board);
     
     if (availablePositions.length === 0) {
