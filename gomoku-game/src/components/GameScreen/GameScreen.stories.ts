@@ -18,14 +18,14 @@ type Story = StoryObj<typeof meta>;
 
 export const BlackPlayerMedium: Story = {
   args: {
-    difficulty: "medium",
+    cpuLevel: "medium",
     playerColor: "black",
     onBackToStart: fn(),
   },
   parameters: {
     docs: {
       description: {
-        story: "黒石でプレイ、難易度「ふつう」のゲーム画面。プレイヤーが先手で15×15のゲームボードが表示される。",
+        story: "黒石でプレイ、CPUレベル「ふつう」のゲーム画面。プレイヤーが先手で15×15のゲームボードが表示される。",
       },
     },
   },

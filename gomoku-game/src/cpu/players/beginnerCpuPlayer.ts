@@ -2,6 +2,7 @@ import { CpuPlayer } from "@/types/cpuPlayer";
 import { StoneColor } from "@/types/stone";
 import { Board } from "@/utils/board";
 import { Position } from "@/types/position";
+import { CpuLevel } from "@/types/cpuLevel";
 import { BOARD_SIZE } from "@/constants/board";
 
 const getAvailablePositions = (board: Board): Position[] => {
@@ -19,7 +20,7 @@ const getAvailablePositions = (board: Board): Position[] => {
 };
 
 export const createBeginnerCpuPlayer = (color: StoneColor): CpuPlayer => ({
-  difficulty: "beginner",
+  cpuLevel: "beginner",
   color,
   calculateNextMove: (board: Board): Position | null => {
     const availablePositions = getAvailablePositions(board);

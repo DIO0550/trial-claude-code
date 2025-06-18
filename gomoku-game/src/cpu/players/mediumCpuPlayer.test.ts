@@ -8,7 +8,7 @@ describe("MediumCpuPlayer", () => {
     test("白石でMediumCPUプレイヤーを作成できる", () => {
       const player = createMediumCpuPlayer("white");
       
-      expect(player.difficulty).toBe("medium");
+      expect(player.cpuLevel).toBe("medium");
       expect(player.color).toBe("white");
       expect(typeof player.calculateNextMove).toBe("function");
     });
@@ -16,7 +16,7 @@ describe("MediumCpuPlayer", () => {
     test("黒石でMediumCPUプレイヤーを作成できる", () => {
       const player = createMediumCpuPlayer("black");
       
-      expect(player.difficulty).toBe("medium");
+      expect(player.cpuLevel).toBe("medium");
       expect(player.color).toBe("black");
       expect(typeof player.calculateNextMove).toBe("function");
     });

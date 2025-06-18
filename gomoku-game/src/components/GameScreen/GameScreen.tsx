@@ -2,17 +2,17 @@
 
 import Stone from "@/components/Stone/Stone";
 import { StoneColor } from "@/types/stone";
-import { DifficultyLevel } from "@/types/difficulty";
+import { CpuLevel } from "@/types/cpuLevel";
 import { JSX } from "react";
 
 interface Props {
-  difficulty: DifficultyLevel;
+  cpuLevel: CpuLevel;
   playerColor: StoneColor;
   onBackToStart: () => void;
 }
 
-const GameScreen = ({ difficulty, playerColor, onBackToStart }: Props): JSX.Element => {
-  const difficultyLabels = {
+const GameScreen = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Element => {
+  const cpuLevelLabels = {
     beginner: "入門",
     easy: "やさしい", 
     medium: "ふつう",
@@ -34,7 +34,7 @@ const GameScreen = ({ difficulty, playerColor, onBackToStart }: Props): JSX.Elem
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-800 mb-2">五目並べ</h1>
             <div className="flex items-center justify-center space-x-4 text-sm text-gray-600">
-              <span>難易度: {difficultyLabels[difficulty]}</span>
+              <span>CPUレベル: {cpuLevelLabels[cpuLevel]}</span>
               <span>|</span>
               <div className="flex items-center space-x-1">
                 <span>あなた:</span>

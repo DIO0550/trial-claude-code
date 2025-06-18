@@ -1,24 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import DifficultySelector from "@/components/DifficultySelector/DifficultySelector";
+import CpuLevelSelector from "@/components/CpuLevelSelector/CpuLevelSelector";
 import ColorSelector from "@/components/ColorSelector/ColorSelector";
 import { StoneColor } from "@/types/stone";
 import { ColorSelection } from "@/types/colorSelection";
-import { DifficultyLevel } from "@/types/difficulty";
+import { CpuLevel } from "@/types/cpuLevel";
 import { JSX } from "react";
 
 interface Props {
-  onStartGame: (difficulty: DifficultyLevel, color: StoneColor) => void;
+  onStartGame: (cpuLevel: CpuLevel, color: StoneColor) => void;
 }
 
 const StartScreen = ({ onStartGame }: Props): JSX.Element => {
-  const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel>("medium");
+  const [selectedCpuLevel, setSelectedCpuLevel] = useState<CpuLevel>("medium");
   const [selectedColor, setSelectedColor] = useState<ColorSelection>("black");
 
   const handleStartGame = () => {
     const finalColor = ColorSelection.resolveColor(selectedColor);
-    onStartGame(selectedDifficulty, finalColor);
+    onStartGame(selectedCpuLevel, finalColor);
   };
 
   return (
@@ -29,9 +29,9 @@ const StartScreen = ({ onStartGame }: Props): JSX.Element => {
         </h1>
         
         <div className="space-y-6">
-          <DifficultySelector
-            selectedDifficulty={selectedDifficulty}
-            onDifficultyChange={setSelectedDifficulty}
+          <CpuLevelSelector
+            selectedCpuLevel={selectedCpuLevel}
+            onCpuLevelChange={setSelectedCpuLevel}
           />
 
           <ColorSelector

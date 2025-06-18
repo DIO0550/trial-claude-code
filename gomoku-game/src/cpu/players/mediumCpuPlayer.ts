@@ -2,6 +2,7 @@ import { CpuPlayer } from "@/types/cpuPlayer";
 import { StoneColor } from "@/types/stone";
 import { Board } from "@/utils/board";
 import { Position } from "@/types/position";
+import { CpuLevel } from "@/types/cpuLevel";
 import { BOARD_SIZE } from "@/constants/board";
 
 // 方向定数
@@ -439,7 +440,7 @@ export const createMediumCpuPlayer = (color: StoneColor): CpuPlayer => {
   }
 
   return {
-    difficulty: "medium",
+    cpuLevel: "medium",
     color,
     calculateNextMove: (board: Board, moveHistory: Position[]): Position | null => {
       const availablePositions = getAvailablePositions(board);

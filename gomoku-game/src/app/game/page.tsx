@@ -4,13 +4,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import GameScreen from "@/components/GameScreen/GameScreen";
 import { StoneColor } from "@/types/stone";
-import { DifficultyLevel } from "@/types/difficulty";
+import { CpuLevel } from "@/types/cpuLevel";
 
 function GamePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  const difficulty = (searchParams.get("difficulty") as DifficultyLevel) || "medium";
+  const cpuLevel = (searchParams.get("cpuLevel") as CpuLevel) || "medium";
   const playerColor = (searchParams.get("color") as StoneColor) || "black";
 
   const handleBackToStart = () => {
@@ -19,7 +19,7 @@ function GamePageContent() {
 
   return (
     <GameScreen
-      difficulty={difficulty}
+      cpuLevel={cpuLevel}
       playerColor={playerColor}
       onBackToStart={handleBackToStart}
     />

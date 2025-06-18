@@ -2,6 +2,7 @@ import { CpuPlayer } from "@/types/cpuPlayer";
 import { StoneColor } from "@/types/stone";
 import { Board } from "@/utils/board";
 import { Position } from "@/types/position";
+import { CpuLevel } from "@/types/cpuLevel";
 import { BOARD_SIZE } from "@/constants/board";
 
 const THREAT_LENGTH = 4;
@@ -192,7 +193,7 @@ const getCenterAreaMoves = (board: Board): Position[] => {
  * @returns EasyレベルのCPUプレイヤー
  */
 export const createEasyCpuPlayer = (color: StoneColor): CpuPlayer => ({
-  difficulty: "easy",
+  cpuLevel: "easy",
   color,
   calculateNextMove: (board: Board, moveHistory: Position[]): Position | null => {
     const availablePositions = getAvailablePositions(board);

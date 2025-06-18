@@ -8,14 +8,14 @@ describe("createBeginnerCpuPlayer", () => {
     it("should create a beginner CPU player with black color", () => {
       const cpu = createBeginnerCpuPlayer("black");
       
-      expect(cpu.difficulty).toBe("beginner");
+      expect(cpu.cpuLevel).toBe("beginner");
       expect(cpu.color).toBe("black");
     });
 
     it("should create a beginner CPU player with white color", () => {
       const cpu = createBeginnerCpuPlayer("white");
       
-      expect(cpu.difficulty).toBe("beginner");
+      expect(cpu.cpuLevel).toBe("beginner");
       expect(cpu.color).toBe("white");
     });
   });

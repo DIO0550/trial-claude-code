@@ -8,7 +8,7 @@ describe("EasyCpuPlayer", () => {
     test("白石でEasyCPUプレイヤーを作成できる", () => {
       const player = createEasyCpuPlayer("white");
       
-      expect(player.difficulty).toBe("easy");
+      expect(player.cpuLevel).toBe("easy");
       expect(player.color).toBe("white");
       expect(typeof player.calculateNextMove).toBe("function");
     });
@@ -16,7 +16,7 @@ describe("EasyCpuPlayer", () => {
     test("黒石でEasyCPUプレイヤーを作成できる", () => {
       const player = createEasyCpuPlayer("black");
       
-      expect(player.difficulty).toBe("easy");
+      expect(player.cpuLevel).toBe("easy");
       expect(player.color).toBe("black");
       expect(typeof player.calculateNextMove).toBe("function");
     });
