@@ -136,6 +136,8 @@ From project conventions:
 
 プロジェクトの開発において、以下のフォルダ内の markdown ファイルを参考にしてください：
 
+**IMPORTANT: Claude Code起動時に必ず以下のマークダウンファイルを読み込んで基本ルールを確認すること**
+
 - **react/**: React 開発に関するベストプラクティスやプロンプトファイル
 
   - `component.prompt.md`: コンポーネント作成ガイド
@@ -148,3 +150,17 @@ From project conventions:
 
 - **general/**: 一般的な開発ガイドライン
   - `commit.prompt.md`: コミットメッセージのガイド
+
+### 必須読み込みファイル
+
+セッション開始時に必ず以下のファイルを読み込んで開発ルールを確認すること：
+
+```
+react/component.prompt.md
+react/custom-hook.prompt.md  
+react/tdd.prompt.md
+react/vitest.prompt.md
+react/standard.prompt.md
+react/comment.prompt.md
+general/commit.prompt.md
+```
