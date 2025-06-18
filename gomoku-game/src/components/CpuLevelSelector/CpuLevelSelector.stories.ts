@@ -18,7 +18,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    selectedCpuLevel: "medium",
+    selectedCpuLevel: "normal",
     onCpuLevelChange: fn(),
   },
 };

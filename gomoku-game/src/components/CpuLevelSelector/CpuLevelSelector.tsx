@@ -10,7 +10,7 @@ const CpuLevelSelector = ({ selectedCpuLevel, onCpuLevelChange }: Props): JSX.El
   const cpuLevelOptions = [
     { value: "beginner", label: "入門", description: "ほぼランダム配置" },
     { value: "easy", label: "やさしい", description: "基本的な防御重視" },
-    { value: "medium", label: "ふつう", description: "攻撃と防御のバランス" },
+    { value: "normal", label: "ふつう", description: "攻撃と防御のバランス" },
     { value: "hard", label: "むずかしい", description: "攻撃重視・3手先読み" },
     { value: "expert", label: "エキスパート", description: "最高レベル・5手先読み" }
   ] as const;

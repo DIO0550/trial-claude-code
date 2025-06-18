@@ -1,28 +1,28 @@
 import { describe, test, expect } from "vitest";
-import { createMediumCpuPlayer } from "./mediumCpuPlayer";
+import { createNormalCpuPlayer } from "./normalCpuPlayer";
 import { Board } from "@/utils/board";
 import { Position } from "@/types/position";
 
-describe("MediumCpuPlayer", () => {
+describe("NormalCpuPlayer", () => {
   describe("プレイヤー作成", () => {
-    test("白石でMediumCPUプレイヤーを作成できる", () => {
-      const player = createMediumCpuPlayer("white");
+    test("白石でNormalCPUプレイヤーを作成できる", () => {
+      const player = createNormalCpuPlayer("white");
       
-      expect(player.cpuLevel).toBe("medium");
+      expect(player.cpuLevel).toBe("normal");
       expect(player.color).toBe("white");
       expect(typeof player.calculateNextMove).toBe("function");
     });
 
-    test("黒石でMediumCPUプレイヤーを作成できる", () => {
-      const player = createMediumCpuPlayer("black");
+    test("黒石でNormalCPUプレイヤーを作成できる", () => {
+      const player = createNormalCpuPlayer("black");
       
-      expect(player.cpuLevel).toBe("medium");
+      expect(player.cpuLevel).toBe("normal");
       expect(player.color).toBe("black");
       expect(typeof player.calculateNextMove).toBe("function");
     });
 
     test("無効な石の色で作成した場合エラーを投げる", () => {
-      expect(() => createMediumCpuPlayer("none")).toThrow(
+      expect(() => createNormalCpuPlayer("none")).toThrow(
         "CPU player color cannot be 'none'"
       );
     });
@@ -31,7 +31,7 @@ describe("MediumCpuPlayer", () => {
   describe("手計算", () => {
     describe("基本動作", () => {
       test("空のボードでは中央に手を打つ", () => {
-        const player = createMediumCpuPlayer("white");
+        const player = createNormalCpuPlayer("white");
         const emptyBoard: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
         const moveHistory: Position[] = [];
 
@@ -42,7 +42,7 @@ describe("MediumCpuPlayer", () => {
       });
 
       test("すべてのマスが埋まっている場合はnullを返す", () => {
-        const player = createMediumCpuPlayer("white");
+        const player = createNormalCpuPlayer("white");
         const fullBoard: Board = Array(15).fill(null).map(() => Array(15).fill("black"));
         const moveHistory: Position[] = [];
 
@@ -52,7 +52,7 @@ describe("MediumCpuPlayer", () => {
       });
 
       test("有効な手のみを返す", () => {
-        const player = createMediumCpuPlayer("white");
+        const player = createNormalCpuPlayer("white");
         const board: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
         
         // いくつかのマスを埋める（序盤定石の対象外にする）
@@ -85,7 +85,7 @@ describe("MediumCpuPlayer", () => {
 
     describe("勝利・防御判定", () => {
       test("自分が勝利できる場合は勝利手を打つ", () => {
-        const player = createMediumCpuPlayer("white");
+        const player = createNormalCpuPlayer("white");
         const board: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
         
         // 横方向に4連続の白石を配置（自分の石）
@@ -108,7 +108,7 @@ describe("MediumCpuPlayer", () => {
       });
 
       test("相手の勝利を阻止する", () => {
-        const player = createMediumCpuPlayer("white");
+        const player = createNormalCpuPlayer("white");
         const board: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
         
         // 横方向に4連続の黒石を配置（相手の石）
@@ -131,7 +131,7 @@ describe("MediumCpuPlayer", () => {
       });
 
       test("勝利が防御より優先される", () => {
-        const player = createMediumCpuPlayer("white");
+        const player = createNormalCpuPlayer("white");
         const board: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
         
         // 自分の勝利手
@@ -162,7 +162,7 @@ describe("MediumCpuPlayer", () => {
 
     describe("序盤定石", () => {
       test("2手目は中央周辺に打つ", () => {
-        const player = createMediumCpuPlayer("white");
+        const player = createNormalCpuPlayer("white");
         const board: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
         
         // 中央に1手目が打たれている
@@ -189,7 +189,7 @@ describe("MediumCpuPlayer", () => {
       });
 
       test("序盤期間後は定石を使用しない", () => {
-        const player = createMediumCpuPlayer("white");
+        const player = createNormalCpuPlayer("white");
         const board: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
         
         // 中央に石を配置
@@ -210,7 +210,7 @@ describe("MediumCpuPlayer", () => {
 
     describe("方向別脅威検出", () => {
       test("縦方向の脅威を検出する", () => {
-        const player = createMediumCpuPlayer("white");
+        const player = createNormalCpuPlayer("white");
         const board: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
         
         // 縦方向に4連続の黒石を配置
@@ -233,7 +233,7 @@ describe("MediumCpuPlayer", () => {
       });
 
       test("右下斜め方向の脅威を検出する", () => {
-        const player = createMediumCpuPlayer("white");
+        const player = createNormalCpuPlayer("white");
         const board: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
         
         // 右下斜め方向に4連続の黒石を配置
@@ -256,7 +256,7 @@ describe("MediumCpuPlayer", () => {
       });
 
       test("左下斜め方向の脅威を検出する", () => {
-        const player = createMediumCpuPlayer("white");
+        const player = createNormalCpuPlayer("white");
         const board: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
         
         // 左下斜め方向に4連続の黒石を配置
@@ -281,7 +281,7 @@ describe("MediumCpuPlayer", () => {
 
     describe("評価関数テスト", () => {
       test("3連続の脅威を適切に評価する", () => {
-        const player = createMediumCpuPlayer("white");
+        const player = createNormalCpuPlayer("white");
         const board: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
         
         // 白石の3連続を作る
@@ -313,7 +313,7 @@ describe("MediumCpuPlayer", () => {
       });
 
       test("中央付近を優先する", () => {
-        const player = createMediumCpuPlayer("white");
+        const player = createNormalCpuPlayer("white");
         const board: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
         
         // 端に少し石を置く
@@ -337,7 +337,7 @@ describe("MediumCpuPlayer", () => {
       });
 
       test("複数の2連続がある場合に適切に評価する", () => {
-        const player = createMediumCpuPlayer("white");
+        const player = createNormalCpuPlayer("white");
         const board: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
         
         // 複数の2連続パターンを配置
@@ -370,7 +370,7 @@ describe("MediumCpuPlayer", () => {
 
     describe("境界値テスト", () => {
       test("ボード端での脅威検出", () => {
-        const player = createMediumCpuPlayer("white");
+        const player = createNormalCpuPlayer("white");
         const board: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
         
         // ボード端での4連続
@@ -394,7 +394,7 @@ describe("MediumCpuPlayer", () => {
       });
 
       test("1つの空きマスのみの場合", () => {
-        const player = createMediumCpuPlayer("white");
+        const player = createNormalCpuPlayer("white");
         const board: Board = Array(15).fill(null).map(() => Array(15).fill("black"));
         
         // 1つだけ空きマスを作る

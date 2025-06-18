@@ -18,7 +18,7 @@ type Story = StoryObj<typeof meta>;
 
 export const BlackPlayerMedium: Story = {
   args: {
-    cpuLevel: "medium",
+    cpuLevel: "normal",
     playerColor: "black",
     onBackToStart: fn(),
   },

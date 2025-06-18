@@ -10,7 +10,7 @@ function GamePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  const cpuLevel = (searchParams.get("cpuLevel") as CpuLevel) || "medium";
+  const cpuLevel = (searchParams.get("cpuLevel") as CpuLevel) || "normal";
   const playerColor = (searchParams.get("color") as StoneColor) || "black";
 
   const handleBackToStart = () => {

@@ -13,7 +13,7 @@ interface Props {
 }
 
 const StartScreen = ({ onStartGame }: Props): JSX.Element => {
-  const [selectedCpuLevel, setSelectedCpuLevel] = useState<CpuLevel>("medium");
+  const [selectedCpuLevel, setSelectedCpuLevel] = useState<CpuLevel>("normal");
   const [selectedColor, setSelectedColor] = useState<ColorSelection>("black");
 
   const handleStartGame = () => {

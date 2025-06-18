@@ -417,7 +417,7 @@ const selectBestMove = (
 };
 
 /**
- * MediumレベルのCPUプレイヤーを作成する
+ * NormalレベルのCPUプレイヤーを作成する
  * 
  * 戦略:
  * 1. 即座勝利または防御が必要な手を最優先
@@ -426,21 +426,21 @@ const selectBestMove = (
  * 4. 3連続・2連続のパターン認識
  * 
  * @param color - CPUプレイヤーの石の色
- * @returns MediumレベルのCPUプレイヤー
+ * @returns NormalレベルのCPUプレイヤー
  * @throws {Error} 無効な石の色が渡された場合
  * @example
  * ```typescript
- * const mediumCpu = createMediumCpuPlayer("white");
- * const nextMove = mediumCpu.calculateNextMove(board, moveHistory);
+ * const normalCpu = createNormalCpuPlayer("white");
+ * const nextMove = normalCpu.calculateNextMove(board, moveHistory);
  * ```
  */
-export const createMediumCpuPlayer = (color: StoneColor): CpuPlayer => {
+export const createNormalCpuPlayer = (color: StoneColor): CpuPlayer => {
   if (StoneColor.isNone(color)) {
     throw new Error("CPU player color cannot be 'none'");
   }
 
   return {
-    cpuLevel: "medium",
+    cpuLevel: "normal",
     color,
     calculateNextMove: (board: Board, moveHistory: Position[]): Position | null => {
       const availablePositions = getAvailablePositions(board);

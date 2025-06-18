@@ -15,7 +15,7 @@ const GameScreen = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Elemen
   const cpuLevelLabels = {
     beginner: "入門",
     easy: "やさしい", 
-    medium: "ふつう",
+    normal: "ふつう",
     hard: "むずかしい",
     expert: "エキスパート"
   };
