@@ -59,7 +59,8 @@ export const RandomSelected: Story = {
   parameters: {
     docs: {
       description: {
-        story: "ランダムが選択された状態のColorSelector。ゲーム開始時に色が決定される。",
+        story:
+          "ランダムが選択された状態のColorSelector。ゲーム開始時に色が決定される。",
       },
     },
   },

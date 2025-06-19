@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { createEasyCpuPlayer } from "./easyCpuPlayer";
 import { Board } from "@/utils/board";
-import { Position } from "@/types/position";
+import { Position } from "@/features/board/utils/position";
 
 describe("EasyCpuPlayer", () => {
   describe("作成", () => {

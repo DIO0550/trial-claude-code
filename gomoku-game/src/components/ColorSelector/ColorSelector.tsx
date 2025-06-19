@@ -1,7 +1,7 @@
 "use client";
 
 import Stone from "@/components/Stone/Stone";
-import { StoneColor } from "@/types/stone";
+import { StoneColor } from "@/features/board/utils/stone";
 import { ColorSelection } from "@/types/colorSelection";
 import { JSX } from "react";
 

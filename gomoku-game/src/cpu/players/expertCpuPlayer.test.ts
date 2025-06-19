@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { createExpertCpuPlayer } from "./expertCpuPlayer";
 import { Board } from "@/utils/board";
-import { Position } from "@/types/position";
+import { Position } from "@/features/board/utils/position";
 
 describe("ExpertCpuPlayer", () => {
   describe("プレイヤー作成", () => {

@@ -1,4 +1,4 @@
-import { StoneColor } from "@/types/stone";
+import { StoneColor } from "@/features/board/utils/stone";
 import { BOARD_SIZE, MIN_COORDINATE, MAX_COORDINATE } from "@/constants/board";
 
 export type Board = (StoneColor)[][];

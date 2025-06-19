@@ -1,7 +1,7 @@
 import { CpuPlayer } from "@/types/cpuPlayer";
-import { StoneColor } from "@/types/stone";
+import { StoneColor } from "@/features/board/utils/stone";
 import { Board } from "@/utils/board";
-import { Position } from "@/types/position";
+import { Position } from "@/features/board/utils/position";
 import { BOARD_SIZE } from "@/constants/board";
 
 const getAvailablePositions = (board: Board): Position[] => {

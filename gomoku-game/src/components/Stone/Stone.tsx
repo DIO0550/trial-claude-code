@@ -1,5 +1,5 @@
 import { JSX } from "react";
-import { StoneColor } from "@/types/stone";
+import { StoneColor } from "@/features/board/utils/stone";
 
 interface Props {
   color: StoneColor;

@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import GameScreen from "@/components/GameScreen/GameScreen";
-import { StoneColor } from "@/types/stone";
+import { StoneColor } from "@/features/board/utils/stone";
 import { CpuLevel } from "@/types/cpuLevel";
 
 function GamePageContent() {

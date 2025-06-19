@@ -1,7 +1,7 @@
-import { StoneColor } from "@/types/stone";
+import { StoneColor } from "@/features/board/utils/stone";
 import { CpuLevel } from "@/types/cpuLevel";
 import { Board } from "@/utils/board";
-import { Position } from "@/types/position";
+import { Position } from "@/features/board/utils/position";
 
 export interface CpuPlayer {
   readonly cpuLevel: CpuLevel;

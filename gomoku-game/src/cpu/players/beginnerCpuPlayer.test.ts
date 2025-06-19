@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { createBeginnerCpuPlayer } from "./beginnerCpuPlayer";
 import { Board } from "@/utils/board";
-import { Position } from "@/types/position";
+import { Position } from "@/features/board/utils/position";
 
 describe("createBeginnerCpuPlayer", () => {
   describe("factory function", () => {

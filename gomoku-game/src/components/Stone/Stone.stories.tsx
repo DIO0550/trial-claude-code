@@ -40,7 +40,7 @@ export const WhiteStone: Story = {
 
 export const EmptySpace: Story = {
   args: {
-    color: null,
+    color: "none",
   },
   parameters: {
     docs: {
@@ -52,6 +52,9 @@ export const EmptySpace: Story = {
 };
 
 export const StoneComparison: Story = {
+  args: {
+    color: "none", // ここはデフォルトの色を設定
+  },
   render: () => (
     <div className="flex items-center space-x-4 p-4">
       <div className="text-center">
@@ -63,15 +66,17 @@ export const StoneComparison: Story = {
         <p className="mt-2 text-sm text-gray-600">白石（後手）</p>
       </div>
       <div className="text-center">
-        <Stone color={null} />
+        <Stone color="none" />
         <p className="mt-2 text-sm text-gray-600">空きマス</p>
       </div>
     </div>
   ),
+
   parameters: {
     docs: {
       description: {
-        story: "黒石、白石、空きマスの比較表示。ゲーム内で使用される全ての石の状態。",
+        story:
+          "黒石、白石、空きマスの比較表示。ゲーム内で使用される全ての石の状態。",
       },
     },
   },

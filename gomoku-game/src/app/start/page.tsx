@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import StartScreen from "@/components/StartScreen/StartScreen";
-import { StoneColor } from "@/types/stone";
+import { StoneColor } from "@/features/board/utils/stone";
 import { CpuLevel } from "@/types/cpuLevel";
 
 export default function StartPage() {

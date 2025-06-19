@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { StoneColor } from "@/types/stone";
+import { StoneColor } from "@/features/board/utils/stone";
 import { Board } from "@/utils/board";
 
 export interface UseGameBoardReturn {
