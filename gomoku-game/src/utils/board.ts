@@ -18,4 +18,14 @@ export const Board = {
       col <= MAX_COORDINATE
     );
   },
+
+  copy: (board: Board): Board => {
+    return board.map(row => [...row]);
+  },
+
+  placeStone: (board: Board, row: number, col: number, color: StoneColor): Board => {
+    const newBoard = Board.copy(board);
+    newBoard[row][col] = color;
+    return newBoard;
+  },
 } as const;

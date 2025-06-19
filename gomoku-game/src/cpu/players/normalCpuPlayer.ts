@@ -161,14 +161,6 @@ const countBidirectionalStones = (
   return forwardCount + backwardCount + 1;
 };
 
-/**
- * ボードのコピーを作成する
- * @param board - 元のボード
- * @returns ボードのディープコピー
- */
-const createBoardCopy = (board: Board): Board => {
-  return board.map(row => [...row]);
-};
 
 /**
  * 指定位置に石を置いた場合の連続数を各方向で計算する
@@ -182,8 +174,7 @@ const calculateConsecutiveCounts = (
   position: Position,
   color: StoneColor
 ): number[] => {
-  const tempBoard = createBoardCopy(board);
-  tempBoard[position.row][position.col] = color;
+  const tempBoard = Board.placeStone(board, position.row, position.col, color);
   
   return DIRECTIONS.map(direction => 
     countBidirectionalStones(
@@ -358,8 +349,7 @@ const minimax = (
   if (isMaximizing) {
     let maxEval = -Infinity;
     for (const position of availablePositions.slice(0, GAME_CONSTANTS.MINIMAX_MAX_POSITIONS)) {
-      const tempBoard = createBoardCopy(board);
-      tempBoard[position.row][position.col] = currentColor;
+      const tempBoard = Board.placeStone(board, position.row, position.col, currentColor);
       
       const evaluation = minimax(tempBoard, color, depth - 1, false);
       maxEval = Math.max(maxEval, evaluation);
@@ -368,8 +358,7 @@ const minimax = (
   } else {
     let minEval = Infinity;
     for (const position of availablePositions.slice(0, GAME_CONSTANTS.MINIMAX_MAX_POSITIONS)) {
-      const tempBoard = createBoardCopy(board);
-      tempBoard[position.row][position.col] = currentColor;
+      const tempBoard = Board.placeStone(board, position.row, position.col, currentColor);
       
       const evaluation = minimax(tempBoard, color, depth - 1, true);
       minEval = Math.min(minEval, evaluation);
@@ -400,8 +389,7 @@ const selectBestMove = (
     // 有望な手について2手先読み
     let totalScore = positionScore;
     if (positionScore > 50) {
-      const tempBoard = createBoardCopy(board);
-      tempBoard[position.row][position.col] = color;
+      const tempBoard = Board.placeStone(board, position.row, position.col, color);
       const futureScore = minimax(tempBoard, color, GAME_CONSTANTS.MINIMAX_DEPTH, false);
       totalScore = positionScore + futureScore * 0.1;
     }

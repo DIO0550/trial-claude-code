@@ -12,19 +12,23 @@ const DIRECTIONS = [
   { deltaRow: 1, deltaCol: -1, name: "diagonal_left" },
 ] as const;
 
-// ゲーム定数（Hardレベル用の調整）
+// ゲーム定数（マジックナンバー排除）
 const GAME_CONSTANTS = {
   EARLY_GAME_MOVE_COUNT: 6,
   CENTER_RADIUS: 5,
   WIN_LENGTH: 5,
   THREAT_LENGTH: 4,
+  THREE_LENGTH: 3,
+  TWO_LENGTH: 2,
   MINIMAX_MAX_POSITIONS: 15,
   MINIMAX_DEPTH: 2,
   ADVANCED_MINIMAX_DEPTH: 3,
-  THREAT_SEARCH_DEPTH: 3,
+  TERRITORY_RADIUS: 2,
+  MINIMAX_THRESHOLD: 100,
+  FUTURE_SCORE_WEIGHT: 0.2,
 } as const;
 
-// 評価値定数（Hardレベル用の詳細化）
+// 評価値定数（より詳細な分離）
 const EVALUATION_SCORES = {
   WIN: 100000,
   BLOCK_WIN: 50000,
@@ -39,10 +43,9 @@ const EVALUATION_SCORES = {
   BLOCK_FORK: 12000,
   CENTER: 10,
   TERRITORY: 5,
-  PATTERN_BONUS: 100,
 } as const;
 
-// 序盤定石位置（拡張版）
+// 序盤定石位置
 const OPENING_POSITIONS = [
   { row: -1, col: -1 }, { row: -1, col: 1 },
   { row: 1, col: -1 }, { row: 1, col: 1 },
@@ -53,9 +56,23 @@ const OPENING_POSITIONS = [
 ] as const;
 
 /**
+ * 連続数の種類を定義
+ */
+type ConsecutiveType = 'win' | 'four' | 'three' | 'two' | 'none';
+
+/**
+ * 連続数から種類を判定する
+ */
+const getConsecutiveType = (consecutive: number): ConsecutiveType => {
+  if (consecutive >= GAME_CONSTANTS.WIN_LENGTH) return 'win';
+  if (consecutive === GAME_CONSTANTS.THREAT_LENGTH) return 'four';
+  if (consecutive === GAME_CONSTANTS.THREE_LENGTH) return 'three';
+  if (consecutive === GAME_CONSTANTS.TWO_LENGTH) return 'two';
+  return 'none';
+};
+
+/**
  * ボード上の空いているポジションを取得する
- * @param board - ゲームボード
- * @returns 空きポジションの配列
  */
 const getAvailablePositions = (board: Board): Position[] => {
   const positions: Position[] = [];
@@ -73,8 +90,6 @@ const getAvailablePositions = (board: Board): Position[] => {
 
 /**
  * 相手の石の色を取得する
- * @param color - プレイヤーの石の色
- * @returns 相手の石の色
  */
 const getOpponentColor = (color: StoneColor): StoneColor => {
   switch (color) {
@@ -89,13 +104,6 @@ const getOpponentColor = (color: StoneColor): StoneColor => {
 
 /**
  * 指定した位置から指定方向に連続した石の数を数える
- * @param board - ゲームボード
- * @param row - 開始行
- * @param col - 開始列
- * @param deltaRow - 行方向の移動量
- * @param deltaCol - 列方向の移動量
- * @param color - 対象の石の色
- * @returns 連続した石の数
  */
 const countConsecutiveStones = (
   board: Board,
@@ -110,8 +118,7 @@ const countConsecutiveStones = (
   let currentCol = col;
   
   while (
-    currentRow >= 0 && currentRow < BOARD_SIZE &&
-    currentCol >= 0 && currentCol < BOARD_SIZE &&
+    Board.isValidPosition(currentRow, currentCol) &&
     board[currentRow][currentCol] === color
   ) {
     count++;
@@ -124,13 +131,6 @@ const countConsecutiveStones = (
 
 /**
  * 指定した位置から双方向に連続した石の数を数える（中心を含む）
- * @param board - ゲームボード
- * @param row - 中心行
- * @param col - 中心列
- * @param deltaRow - 行方向の移動量
- * @param deltaCol - 列方向の移動量
- * @param color - 対象の石の色
- * @returns 双方向の連続した石の数（中心を含む）
  */
 const countBidirectionalStones = (
   board: Board,
@@ -153,12 +153,6 @@ const countBidirectionalStones = (
 
 /**
  * パターンが開放されているかチェックする（両端が空いているか）
- * @param board - ゲームボード
- * @param row - 中心行
- * @param col - 中心列
- * @param deltaRow - 行方向の移動量
- * @param deltaCol - 列方向の移動量
- * @returns 開放されているかどうか
  */
 const isPatternOpen = (
   board: Board,
@@ -184,8 +178,7 @@ const isPatternOpen = (
   };
   
   const forwardOpen = (
-    forwardEnd.row >= 0 && forwardEnd.row < BOARD_SIZE &&
-    forwardEnd.col >= 0 && forwardEnd.col < BOARD_SIZE &&
+    Board.isValidPosition(forwardEnd.row, forwardEnd.col) &&
     StoneColor.isNone(board[forwardEnd.row][forwardEnd.col])
   );
   
@@ -196,8 +189,7 @@ const isPatternOpen = (
   };
   
   const backwardOpen = (
-    backwardEnd.row >= 0 && backwardEnd.row < BOARD_SIZE &&
-    backwardEnd.col >= 0 && backwardEnd.col < BOARD_SIZE &&
+    Board.isValidPosition(backwardEnd.row, backwardEnd.col) &&
     StoneColor.isNone(board[backwardEnd.row][backwardEnd.col])
   );
   
@@ -205,28 +197,14 @@ const isPatternOpen = (
 };
 
 /**
- * ボードのコピーを作成する
- * @param board - 元のボード
- * @returns ボードのディープコピー
- */
-const createBoardCopy = (board: Board): Board => {
-  return board.map(row => [...row]);
-};
-
-/**
  * 指定位置に石を置いた場合の連続数を各方向で計算する
- * @param board - ゲームボード
- * @param position - 評価する位置
- * @param color - 石の色
- * @returns 各方向の連続数の配列
  */
 const calculateConsecutiveCounts = (
   board: Board,
   position: Position,
   color: StoneColor
 ): number[] => {
-  const tempBoard = createBoardCopy(board);
-  tempBoard[position.row][position.col] = color;
+  const tempBoard = Board.placeStone(board, position.row, position.col, color);
   
   return DIRECTIONS.map(direction => 
     countBidirectionalStones(
@@ -241,19 +219,137 @@ const calculateConsecutiveCounts = (
 };
 
 /**
+ * 攻撃パターンの評価を計算する
+ */
+const evaluateOffensivePattern = (
+  board: Board,
+  position: Position,
+  color: StoneColor
+): number => {
+  let score = 0;
+  const myConsecutiveCounts = calculateConsecutiveCounts(board, position, color);
+  
+  for (let i = 0; i < myConsecutiveCounts.length; i++) {
+    const consecutive = myConsecutiveCounts[i];
+    const direction = DIRECTIONS[i];
+    const consecutiveType = getConsecutiveType(consecutive);
+    
+    switch (consecutiveType) {
+      case 'win':
+        score += EVALUATION_SCORES.WIN;
+        break;
+      case 'four':
+        score += EVALUATION_SCORES.FOUR;
+        break;
+      case 'three':
+        score += evaluateThreePattern(board, position, color, direction);
+        break;
+      case 'two':
+        score += evaluateTwoPattern(board, position, color, direction);
+        break;
+    }
+  }
+  
+  return score;
+};
+
+/**
+ * 3連続パターンの詳細評価
+ */
+const evaluateThreePattern = (
+  board: Board,
+  position: Position,
+  color: StoneColor,
+  direction: typeof DIRECTIONS[number]
+): number => {
+  const tempBoard = Board.placeStone(board, position.row, position.col, color);
+  
+  return isPatternOpen(tempBoard, position.row, position.col, 
+                      direction.deltaRow, direction.deltaCol)
+    ? EVALUATION_SCORES.THREE_OPEN 
+    : EVALUATION_SCORES.THREE;
+};
+
+/**
+ * 2連続パターンの詳細評価
+ */
+const evaluateTwoPattern = (
+  board: Board,
+  position: Position,
+  color: StoneColor,
+  direction: typeof DIRECTIONS[number]
+): number => {
+  const tempBoard = Board.placeStone(board, position.row, position.col, color);
+  
+  return isPatternOpen(tempBoard, position.row, position.col,
+                      direction.deltaRow, direction.deltaCol)
+    ? EVALUATION_SCORES.TWO_OPEN
+    : EVALUATION_SCORES.TWO;
+};
+
+/**
+ * 防御パターンの評価を計算する
+ */
+const evaluateDefensivePattern = (
+  board: Board,
+  position: Position,
+  opponentColor: StoneColor
+): number => {
+  let score = 0;
+  const opponentConsecutiveCounts = calculateConsecutiveCounts(board, position, opponentColor);
+  
+  for (const consecutive of opponentConsecutiveCounts) {
+    const consecutiveType = getConsecutiveType(consecutive);
+    
+    switch (consecutiveType) {
+      case 'win':
+        score += EVALUATION_SCORES.BLOCK_WIN;
+        break;
+      case 'four':
+        score += EVALUATION_SCORES.BLOCK_FOUR;
+        break;
+      case 'three':
+        score += EVALUATION_SCORES.BLOCK_THREE;
+        break;
+    }
+  }
+  
+  return score;
+};
+
+/**
  * フォーク攻撃の可能性を検出する
- * @param board - ゲームボード
- * @param position - 評価する位置
- * @param color - 石の色
- * @returns フォーク攻撃のスコア
+ */
+const evaluateForkThreats = (
+  board: Board,
+  position: Position,
+  color: StoneColor,
+  opponentColor: StoneColor
+): number => {
+  let score = 0;
+  
+  // 自分のフォーク攻撃
+  const myForkScore = detectForkThreat(board, position, color);
+  score += myForkScore;
+  
+  // 相手のフォーク攻撃阻止
+  const opponentForkScore = detectForkThreat(board, position, opponentColor);
+  if (opponentForkScore > 0) {
+    score += EVALUATION_SCORES.BLOCK_FORK;
+  }
+  
+  return score;
+};
+
+/**
+ * フォーク攻撃スコアを計算する
  */
 const detectForkThreat = (
   board: Board,
   position: Position,
   color: StoneColor
 ): number => {
-  const tempBoard = createBoardCopy(board);
-  tempBoard[position.row][position.col] = color;
+  const tempBoard = Board.placeStone(board, position.row, position.col, color);
   
   let threatCount = 0;
   
@@ -267,7 +363,7 @@ const detectForkThreat = (
       color
     );
     
-    if (consecutive >= 3) {
+    if (consecutive >= GAME_CONSTANTS.THREE_LENGTH) {
       threatCount++;
     }
   }
@@ -276,113 +372,36 @@ const detectForkThreat = (
 };
 
 /**
- * 高度な位置評価（フォーク、開放パターン、領域支配を考慮）
- * @param board - ゲームボード
- * @param position - 評価する位置
- * @param color - 石の色
- * @param opponentColor - 相手の石の色
- * @returns 評価値
+ * 位置的ボーナスを計算する
  */
-const evaluatePositionAdvanced = (
-  board: Board,
-  position: Position,
-  color: StoneColor,
-  opponentColor: StoneColor
-): number => {
-  let score = 0;
-  
-  // 基本的な連続数による評価
-  const myConsecutiveCounts = calculateConsecutiveCounts(board, position, color);
-  for (let i = 0; i < myConsecutiveCounts.length; i++) {
-    const consecutive = myConsecutiveCounts[i];
-    const direction = DIRECTIONS[i];
-    
-    if (consecutive >= GAME_CONSTANTS.WIN_LENGTH) {
-      score += EVALUATION_SCORES.WIN;
-    } else if (consecutive === GAME_CONSTANTS.THREAT_LENGTH) {
-      score += EVALUATION_SCORES.FOUR;
-    } else if (consecutive === 3) {
-      const tempBoard = createBoardCopy(board);
-      tempBoard[position.row][position.col] = color;
-      
-      if (isPatternOpen(tempBoard, position.row, position.col, 
-                        direction.deltaRow, direction.deltaCol)) {
-        score += EVALUATION_SCORES.THREE_OPEN;
-      } else {
-        score += EVALUATION_SCORES.THREE;
-      }
-    } else if (consecutive === 2) {
-      const tempBoard = createBoardCopy(board);
-      tempBoard[position.row][position.col] = color;
-      
-      if (isPatternOpen(tempBoard, position.row, position.col,
-                        direction.deltaRow, direction.deltaCol)) {
-        score += EVALUATION_SCORES.TWO_OPEN;
-      } else {
-        score += EVALUATION_SCORES.TWO;
-      }
-    }
-  }
-  
-  // 相手の脅威阻止による評価
-  const opponentConsecutiveCounts = calculateConsecutiveCounts(board, position, opponentColor);
-  for (const consecutive of opponentConsecutiveCounts) {
-    if (consecutive >= GAME_CONSTANTS.WIN_LENGTH) {
-      score += EVALUATION_SCORES.BLOCK_WIN;
-    } else if (consecutive === GAME_CONSTANTS.THREAT_LENGTH) {
-      score += EVALUATION_SCORES.BLOCK_FOUR;
-    } else if (consecutive === 3) {
-      score += EVALUATION_SCORES.BLOCK_THREE;
-    }
-  }
-  
-  // フォーク攻撃の検出
-  score += detectForkThreat(board, position, color);
-  
-  // 相手のフォーク攻撃阻止
-  const opponentFork = detectForkThreat(board, position, opponentColor);
-  if (opponentFork > 0) {
-    score += EVALUATION_SCORES.BLOCK_FORK;
-  }
-  
-  // 中央付近のボーナス
+const evaluatePositionalBonus = (position: Position): number => {
   const center = Math.floor(BOARD_SIZE / 2);
   const distanceFromCenter = Math.abs(position.row - center) + Math.abs(position.col - center);
+  
   if (distanceFromCenter <= GAME_CONSTANTS.CENTER_RADIUS) {
-    score += EVALUATION_SCORES.CENTER * (GAME_CONSTANTS.CENTER_RADIUS - distanceFromCenter + 1);
+    return EVALUATION_SCORES.CENTER * (GAME_CONSTANTS.CENTER_RADIUS - distanceFromCenter + 1);
   }
   
-  // 領域支配ボーナス
-  const territoryScore = calculateTerritoryScore(board, position, color);
-  score += territoryScore;
-  
-  return score;
+  return 0;
 };
 
 /**
  * 領域支配スコアを計算する
- * @param board - ゲームボード
- * @param position - 評価する位置
- * @param color - 石の色
- * @returns 領域スコア
  */
-const calculateTerritoryScore = (
+const evaluateTerritoryControl = (
   board: Board,
   position: Position,
   color: StoneColor
 ): number => {
   let territoryScore = 0;
-  const radius = 2;
   
-  for (let dr = -radius; dr <= radius; dr++) {
-    for (let dc = -radius; dc <= radius; dc++) {
+  for (let dr = -GAME_CONSTANTS.TERRITORY_RADIUS; dr <= GAME_CONSTANTS.TERRITORY_RADIUS; dr++) {
+    for (let dc = -GAME_CONSTANTS.TERRITORY_RADIUS; dc <= GAME_CONSTANTS.TERRITORY_RADIUS; dc++) {
       const r = position.row + dr;
       const c = position.col + dc;
       
-      if (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE) {
-        if (board[r][c] === color) {
-          territoryScore += EVALUATION_SCORES.TERRITORY;
-        }
+      if (Board.isValidPosition(r, c) && board[r][c] === color) {
+        territoryScore += EVALUATION_SCORES.TERRITORY;
       }
     }
   }
@@ -391,11 +410,23 @@ const calculateTerritoryScore = (
 };
 
 /**
+ * 統合的な位置評価（責任分離版）
+ */
+const evaluatePosition = (
+  board: Board,
+  position: Position,
+  color: StoneColor,
+  opponentColor: StoneColor
+): number => {
+  return evaluateOffensivePattern(board, position, color) +
+         evaluateDefensivePattern(board, position, opponentColor) +
+         evaluateForkThreats(board, position, color, opponentColor) +
+         evaluatePositionalBonus(position) +
+         evaluateTerritoryControl(board, position, color);
+};
+
+/**
  * 即座勝利または防御が必要な手を見つける
- * @param board - ゲームボード
- * @param color - 自分の石の色
- * @param opponentColor - 相手の石の色
- * @returns 重要な手のポジション（なければnull）
  */
 const findCriticalMove = (
   board: Board,
@@ -425,9 +456,6 @@ const findCriticalMove = (
 
 /**
  * 序盤の定石配置を取得する
- * @param board - ゲームボード
- * @param moveHistory - 手順履歴
- * @returns 定石位置（なければnull）
  */
 const getOpeningMove = (board: Board, moveHistory: Position[]): Position | null => {
   if (moveHistory.length >= GAME_CONSTANTS.EARLY_GAME_MOVE_COUNT) {
@@ -449,8 +477,7 @@ const getOpeningMove = (board: Board, moveHistory: Position[]): Position | null 
     };
     
     if (
-      position.row >= 0 && position.row < BOARD_SIZE &&
-      position.col >= 0 && position.col < BOARD_SIZE &&
+      Board.isValidPosition(position.row, position.col) &&
       StoneColor.isNone(board[position.row][position.col])
     ) {
       return position;
@@ -461,16 +488,29 @@ const getOpeningMove = (board: Board, moveHistory: Position[]): Position | null 
 };
 
 /**
- * 高度なミニマックス法による3手先読み
- * @param board - ゲームボード
- * @param color - 自分の石の色
- * @param depth - 探索深度
- * @param isMaximizing - 最大化プレイヤーかどうか
- * @param alpha - アルファ値（アルファベータ法用）
- * @param beta - ベータ値（アルファベータ法用）
- * @returns 評価値
+ * 候補手をスコア順にソートする
  */
-const minimaxAdvanced = (
+const getSortedCandidates = (
+  board: Board,
+  availablePositions: Position[],
+  color: StoneColor,
+  opponentColor: StoneColor,
+  maxCount: number
+): Position[] => {
+  return availablePositions
+    .map(pos => ({
+      position: pos,
+      score: evaluatePosition(board, pos, color, opponentColor)
+    }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, maxCount)
+    .map(item => item.position);
+};
+
+/**
+ * ミニマックス法による探索（アルファベータ剪定付き）
+ */
+const minimax = (
   board: Board,
   color: StoneColor,
   depth: number,
@@ -484,24 +524,22 @@ const minimaxAdvanced = (
   
   const availablePositions = getAvailablePositions(board);
   const currentColor = isMaximizing ? color : getOpponentColor(color);
+  const opponentColor = getOpponentColor(currentColor);
   
-  // 有望な手を優先的に評価
-  const sortedPositions = availablePositions
-    .map(pos => ({
-      position: pos,
-      score: evaluatePositionAdvanced(board, pos, currentColor, getOpponentColor(currentColor))
-    }))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, GAME_CONSTANTS.MINIMAX_MAX_POSITIONS)
-    .map(item => item.position);
+  const sortedPositions = getSortedCandidates(
+    board, 
+    availablePositions, 
+    currentColor, 
+    opponentColor,
+    GAME_CONSTANTS.MINIMAX_MAX_POSITIONS
+  );
   
   if (isMaximizing) {
     let maxEval = -Infinity;
     for (const position of sortedPositions) {
-      const tempBoard = createBoardCopy(board);
-      tempBoard[position.row][position.col] = currentColor;
+      const tempBoard = Board.placeStone(board, position.row, position.col, currentColor);
+      const evaluation = minimax(tempBoard, color, depth - 1, false, alpha, beta);
       
-      const evaluation = minimaxAdvanced(tempBoard, color, depth - 1, false, alpha, beta);
       maxEval = Math.max(maxEval, evaluation);
       alpha = Math.max(alpha, evaluation);
       
@@ -513,10 +551,9 @@ const minimaxAdvanced = (
   } else {
     let minEval = Infinity;
     for (const position of sortedPositions) {
-      const tempBoard = createBoardCopy(board);
-      tempBoard[position.row][position.col] = currentColor;
+      const tempBoard = Board.placeStone(board, position.row, position.col, currentColor);
+      const evaluation = minimax(tempBoard, color, depth - 1, true, alpha, beta);
       
-      const evaluation = minimaxAdvanced(tempBoard, color, depth - 1, true, alpha, beta);
       minEval = Math.min(minEval, evaluation);
       beta = Math.min(beta, evaluation);
       
@@ -529,13 +566,9 @@ const minimaxAdvanced = (
 };
 
 /**
- * 最適手を選択する関数（高度な評価関数と3手先読みミニマックスを組み合わせ）
- * @param board - ゲームボード
- * @param color - 自分の石の色
- * @param opponentColor - 相手の石の色
- * @returns 最適手のポジション
+ * 最適手を選択する関数（責任分離版）
  */
-const selectBestMoveAdvanced = (
+const selectBestMove = (
   board: Board,
   color: StoneColor,
   opponentColor: StoneColor
@@ -545,20 +578,19 @@ const selectBestMoveAdvanced = (
   let bestScore = -Infinity;
 
   for (const position of availablePositions) {
-    const positionScore = evaluatePositionAdvanced(board, position, color, opponentColor);
+    const positionScore = evaluatePosition(board, position, color, opponentColor);
     
     // 有望な手について3手先読み
     let totalScore = positionScore;
-    if (positionScore > 100) {
-      const tempBoard = createBoardCopy(board);
-      tempBoard[position.row][position.col] = color;
-      const futureScore = minimaxAdvanced(
+    if (positionScore > GAME_CONSTANTS.MINIMAX_THRESHOLD) {
+      const tempBoard = Board.placeStone(board, position.row, position.col, color);
+      const futureScore = minimax(
         tempBoard, 
         color, 
         GAME_CONSTANTS.ADVANCED_MINIMAX_DEPTH, 
         false
       );
-      totalScore = positionScore + futureScore * 0.2;
+      totalScore = positionScore + futureScore * GAME_CONSTANTS.FUTURE_SCORE_WEIGHT;
     }
     
     if (totalScore > bestScore) {
@@ -571,20 +603,14 @@ const selectBestMoveAdvanced = (
 };
 
 /**
- * HardレベルのCPUプレイヤーを作成する
+ * HardレベルのCPUプレイヤーを作成する（リファクタリング版）
  * 
- * 戦略:
- * 1. 即座勝利または防御が必要な手を最優先
- * 2. 序盤では定石配置
- * 3. フォーク攻撃の認識と対処
- * 4. 開放パターンの重視
- * 5. 高度な評価関数による最適手選択（3手先読み考慮）
- * 6. 領域支配を意識した戦略
- * 7. アルファベータ法による効率的な探索
- * 
- * @param color - CPUプレイヤーの石の色
- * @returns HardレベルのCPUプレイヤー
- * @throws {Error} 無効な石の色が渡された場合
+ * 改善点:
+ * 1. 責任分離：評価関数を目的別に分割
+ * 2. マジックナンバー排除：すべて定数化
+ * 3. Board責任：copy/placeStoneをBoard側に移動
+ * 4. 型安全性：ConsecutiveType等で型レベルでの制約
+ * 5. 可読性：複雑な条件分岐をswitch文と専用関数に分離
  */
 export const createHardCpuPlayer = (color: StoneColor): CpuPlayer => {
   if (StoneColor.isNone(color)) {
@@ -616,7 +642,7 @@ export const createHardCpuPlayer = (color: StoneColor): CpuPlayer => {
       }
 
       // 3. 高度な評価関数による最適手選択
-      return selectBestMoveAdvanced(board, color, opponentColor);
+      return selectBestMove(board, color, opponentColor);
     },
   };
 };
