@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { StoneColor } from "@/features/board/utils/stone";
-import { Board } from "@/utils/board";
+import { Board } from "@/features/board/utils/board";
 
 export interface UseGameBoardReturn {
   board: Board;

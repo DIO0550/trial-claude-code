@@ -1,4 +1,4 @@
-import { MIN_COORDINATE, MAX_COORDINATE } from "@/constants/board";
+import { MIN_COORDINATE, MAX_COORDINATE } from "@/features/board/constants/dimensions";
 
 export interface Position {
   row: number;

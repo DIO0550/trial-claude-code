@@ -1,5 +1,5 @@
 import { StoneColor } from "@/features/board/utils/stone";
-import { BOARD_SIZE, MIN_COORDINATE, MAX_COORDINATE } from "@/constants/board";
+import { BOARD_SIZE, MIN_COORDINATE, MAX_COORDINATE } from "@/features/board/constants/dimensions";
 
 export type Board = (StoneColor)[][];
 

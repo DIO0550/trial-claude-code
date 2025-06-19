@@ -1,6 +1,6 @@
 import { StoneColor } from "@/features/board/utils/stone";
 import { CpuLevel } from "@/types/cpuLevel";
-import { Board } from "@/utils/board";
+import { Board } from "@/features/board/utils/board";
 import { Position } from "@/features/board/utils/position";
 
 export interface CpuPlayer {

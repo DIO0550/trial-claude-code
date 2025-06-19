@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createNormalCpuPlayer } from "./normalCpuPlayer";
-import { Board } from "@/utils/board";
+import { Board } from "@/features/board/utils/board";
 import { Position } from "@/features/board/utils/position";
 
 describe("NormalCpuPlayer", () => {

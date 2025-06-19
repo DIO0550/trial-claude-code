@@ -1,8 +1,8 @@
 import { CpuPlayer } from "@/types/cpuPlayer";
 import { StoneColor } from "@/features/board/utils/stone";
-import { Board } from "@/utils/board";
+import { Board } from "@/features/board/utils/board";
 import { Position } from "@/features/board/utils/position";
-import { BOARD_SIZE } from "@/constants/board";
+import { BOARD_SIZE } from "@/features/board/constants/dimensions";
 
 const getAvailablePositions = (board: Board): Position[] => {
   const positions: Position[] = [];

@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { createHardCpuPlayer } from "./hardCpuPlayer";
-import { Board } from "@/utils/board";
+import { Board } from "@/features/board/utils/board";
 import { Position } from "@/features/board/utils/position";
 
 describe("HardCpuPlayer", () => {

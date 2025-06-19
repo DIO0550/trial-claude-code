@@ -1,4 +1,4 @@
-import { StoneColor } from "./stone";
+import { StoneColor } from "@/features/board/utils/stone";
 
 export type ColorSelection = StoneColor | "random";
 
