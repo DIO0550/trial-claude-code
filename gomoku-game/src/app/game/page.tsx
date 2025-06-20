@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import GameBoard from "@/components/GameBoard/GameBoard";
+import GameBoard from "@/features/game/components/GameBoard/GameBoard";
 import { StoneColor } from "@/features/board/utils/stone";
 import { CpuLevel } from "@/features/cpu/utils/cpuLevel";
 

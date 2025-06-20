@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import CpuLevelSelector from "@/components/CpuLevelSelector/CpuLevelSelector";
-import ColorSelector from "@/components/ColorSelector/ColorSelector";
+import CpuLevelSelector from "@/features/cpu/components/CpuLevelSelector/CpuLevelSelector";
+import ColorSelector from "@/features/game/components/ColorSelector/ColorSelector";
 import { StoneColor } from "@/features/board/utils/stone";
 import { ColorSelection } from "@/types/colorSelection";
 import { CpuLevel } from "@/features/cpu/utils/cpuLevel";

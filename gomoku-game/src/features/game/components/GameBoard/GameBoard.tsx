@@ -1,7 +1,7 @@
 "use client";
 
 import Stone from "@/components/Stone/Stone";
-import TurnIndicator from "@/components/TurnIndicator/TurnIndicator";
+import TurnIndicator from "@/features/game/components/TurnIndicator/TurnIndicator";
 import { StoneColor } from "@/features/board/utils/stone";
 import { CpuLevel } from "@/features/cpu/utils/cpuLevel";
 import { JSX } from "react";

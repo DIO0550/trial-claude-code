@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import GameSetup from "@/components/GameSetup/GameSetup";
+import GameSetup from "@/features/game/components/GameSetup/GameSetup";
 import { StoneColor } from "@/features/board/utils/stone";
 import { CpuLevel } from "@/features/cpu/utils/cpuLevel";
 
