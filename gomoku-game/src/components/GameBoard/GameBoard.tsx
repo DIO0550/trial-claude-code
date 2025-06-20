@@ -1,6 +1,7 @@
 "use client";
 
 import Stone from "@/components/Stone/Stone";
+import TurnIndicator from "@/components/TurnIndicator/TurnIndicator";
 import { StoneColor } from "@/features/board/utils/stone";
 import { CpuLevel } from "@/features/cpu/utils/cpuLevel";
 import { JSX } from "react";
@@ -64,14 +65,7 @@ const GameBoard = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Element
             </div>
           </div>
 
-          <div className="mt-6 text-center">
-            <div className="bg-blue-50 rounded-lg p-4">
-              <p className="text-gray-700">
-                <span className="font-semibold">現在のターン:</span> 
-                {playerColor === "black" ? " あなた（先手）" : " CPU（先手）"}
-              </p>
-            </div>
-          </div>
+          <TurnIndicator playerColor={playerColor} />
         </div>
       </div>
     </div>
