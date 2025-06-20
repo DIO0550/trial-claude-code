@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { fn } from "storybook/test";
-import GameScreen from "./GameScreen";
+import GameBoard from "./GameBoard";
 
 const meta = {
-  component: GameScreen,
+  component: GameBoard,
   parameters: {
     layout: "fullscreen",
   },
@@ -11,7 +11,7 @@ const meta = {
   args: {
     onBackToStart: fn(),
   },
-} satisfies Meta<typeof GameScreen>;
+} satisfies Meta<typeof GameBoard>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -26,7 +26,7 @@ export const BlackPlayerMedium: Story = {
     docs: {
       description: {
         story:
-          "黒石でプレイ、CPUレベル「ふつう」のゲーム画面。プレイヤーが先手で15×15のゲームボードが表示される。",
+          "黒石でプレイ、CPUレベル「ふつう」のゲームボード。プレイヤーが先手で15×15のゲームボードが表示される。",
       },
     },
   },
@@ -42,7 +42,7 @@ export const WhitePlayerHard: Story = {
     docs: {
       description: {
         story:
-          "白石でプレイ、難易度「むずかしい」のゲーム画面。CPUが先手でプレイヤーは後手となる。",
+          "白石でプレイ、難易度「むずかしい」のゲームボード。CPUが先手でプレイヤーは後手となる。",
       },
     },
   },
@@ -58,7 +58,7 @@ export const BlackPlayerBeginner: Story = {
     docs: {
       description: {
         story:
-          "黒石でプレイ、難易度「入門」のゲーム画面。最も易しい難易度設定。",
+          "黒石でプレイ、難易度「入門」のゲームボード。最も易しい難易度設定。",
       },
     },
   },
@@ -74,7 +74,7 @@ export const WhitePlayerExpert: Story = {
     docs: {
       description: {
         story:
-          "白石でプレイ、難易度「エキスパート」のゲーム画面。最高難易度でCPUが5手先読みを行う。",
+          "白石でプレイ、難易度「エキスパート」のゲームボード。最高難易度でCPUが5手先読みを行う。",
       },
     },
   },
@@ -90,7 +90,7 @@ export const BlackPlayerEasy: Story = {
     docs: {
       description: {
         story:
-          "黒石でプレイ、難易度「やさしい」のゲーム画面。基本的な防御重視のCPU。",
+          "黒石でプレイ、難易度「やさしい」のゲームボード。基本的な防御重視のCPU。",
       },
     },
   },

@@ -11,7 +11,7 @@ interface Props {
   onBackToStart: () => void;
 }
 
-const GameScreen = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Element => {
+const GameBoard = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Element => {
   const cpuLevelLabels = {
     beginner: "入門",
     easy: "やさしい", 
@@ -78,4 +78,4 @@ const GameScreen = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Elemen
   );
 };
 
-export default GameScreen;
+export default GameBoard;

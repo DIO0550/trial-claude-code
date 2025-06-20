@@ -12,7 +12,7 @@ interface Props {
   onStartGame: (cpuLevel: CpuLevel, color: StoneColor) => void;
 }
 
-const StartScreen = ({ onStartGame }: Props): JSX.Element => {
+const GameSetup = ({ onStartGame }: Props): JSX.Element => {
   const [selectedCpuLevel, setSelectedCpuLevel] = useState<CpuLevel>("normal");
   const [selectedColor, setSelectedColor] = useState<ColorSelection>("black");
 
@@ -51,4 +51,4 @@ const StartScreen = ({ onStartGame }: Props): JSX.Element => {
   );
 };
 
-export default StartScreen;
+export default GameSetup;

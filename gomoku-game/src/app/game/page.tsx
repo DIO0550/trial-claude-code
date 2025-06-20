@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import GameScreen from "@/components/GameScreen/GameScreen";
+import GameBoard from "@/components/GameBoard/GameBoard";
 import { StoneColor } from "@/features/board/utils/stone";
 import { CpuLevel } from "@/features/cpu/utils/cpuLevel";
 
@@ -18,7 +18,7 @@ function GamePageContent() {
   };
 
   return (
-    <GameScreen
+    <GameBoard
       cpuLevel={cpuLevel}
       playerColor={playerColor}
       onBackToStart={handleBackToStart}
