@@ -1,5 +1,5 @@
 import { JSX } from "react";
-import { CpuLevel } from "@/types/cpuLevel";
+import { CpuLevel } from "@/features/cpu/utils/cpuLevel";
 
 interface Props {
   selectedCpuLevel: CpuLevel;

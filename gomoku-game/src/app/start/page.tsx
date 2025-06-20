@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import StartScreen from "@/components/StartScreen/StartScreen";
 import { StoneColor } from "@/features/board/utils/stone";
-import { CpuLevel } from "@/types/cpuLevel";
+import { CpuLevel } from "@/features/cpu/utils/cpuLevel";
 
 export default function StartPage() {
   const router = useRouter();

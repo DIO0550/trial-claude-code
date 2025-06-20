@@ -5,7 +5,7 @@ import CpuLevelSelector from "@/components/CpuLevelSelector/CpuLevelSelector";
 import ColorSelector from "@/components/ColorSelector/ColorSelector";
 import { StoneColor } from "@/features/board/utils/stone";
 import { ColorSelection } from "@/types/colorSelection";
-import { CpuLevel } from "@/types/cpuLevel";
+import { CpuLevel } from "@/features/cpu/utils/cpuLevel";
 import { JSX } from "react";
 
 interface Props {

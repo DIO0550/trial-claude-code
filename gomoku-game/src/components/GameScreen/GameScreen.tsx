@@ -2,7 +2,7 @@
 
 import Stone from "@/components/Stone/Stone";
 import { StoneColor } from "@/features/board/utils/stone";
-import { CpuLevel } from "@/types/cpuLevel";
+import { CpuLevel } from "@/features/cpu/utils/cpuLevel";
 import { JSX } from "react";
 
 interface Props {

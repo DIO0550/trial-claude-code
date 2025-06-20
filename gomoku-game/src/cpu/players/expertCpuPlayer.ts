@@ -1,4 +1,4 @@
-import { CpuPlayer } from "@/types/cpuPlayer";
+import { CpuPlayer } from "@/features/cpu/utils/cpuPlayer";
 import { StoneColor } from "@/features/board/utils/stone";
 import { Board } from "@/features/board/utils/board";
 import { Position } from "@/features/board/utils/position";

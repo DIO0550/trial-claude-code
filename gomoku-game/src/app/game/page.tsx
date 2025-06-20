@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import GameScreen from "@/components/GameScreen/GameScreen";
 import { StoneColor } from "@/features/board/utils/stone";
-import { CpuLevel } from "@/types/cpuLevel";
+import { CpuLevel } from "@/features/cpu/utils/cpuLevel";
 
 function GamePageContent() {
   const router = useRouter();
