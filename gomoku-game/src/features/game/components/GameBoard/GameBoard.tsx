@@ -1,6 +1,7 @@
 "use client";
 
 import Stone from "@/components/Stone/Stone";
+import Button from "@/components/elements/Button/Button";
 import TurnIndicator from "@/features/game/components/TurnIndicator/TurnIndicator";
 import { StoneColor } from "@/features/board/utils/stone";
 import { CpuLevel } from "@/features/cpu/utils/cpuLevel";
@@ -25,12 +26,13 @@ const GameBoard = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Element
     <div className="min-h-screen flex flex-col items-center p-4 bg-gray-50">
       <div className="w-full max-w-4xl">
         <div className="flex justify-between items-center mb-6">
-          <button
+          <Button
             onClick={onBackToStart}
-            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+            variant="secondary"
+            size="medium"
           >
             スタート画面に戻る
-          </button>
+          </Button>
           
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-800 mb-2">五目並べ</h1>

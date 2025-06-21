@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Button from "@/components/elements/Button/Button";
 import CpuLevelSelector from "@/features/cpu/components/CpuLevelSelector/CpuLevelSelector";
 import ColorSelector from "@/features/game/components/ColorSelector/ColorSelector";
 import { StoneColor } from "@/features/board/utils/stone";
@@ -39,12 +40,14 @@ const GameSetup = ({ onStartGame }: Props): JSX.Element => {
             onColorChange={setSelectedColor}
           />
 
-          <button
+          <Button
             onClick={handleStartGame}
-            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+            variant="primary"
+            size="large"
+            fullWidth
           >
             ゲーム開始
-          </button>
+          </Button>
         </div>
       </div>
     </div>
