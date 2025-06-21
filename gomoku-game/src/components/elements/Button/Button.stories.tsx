@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs";
-import { fn } from "@storybook/test";
+import { fn } from "storybook/test";
 import Button from "./Button";
 
 const meta = {
@@ -120,6 +120,9 @@ export const Disabled: Story = {
 };
 
 export const VariantComparison: Story = {
+  args: {
+    children: "比較用ボタン",
+  },
   render: () => (
     <div className="flex items-center space-x-4">
       <Button variant="primary">プライマリ</Button>
@@ -136,6 +139,9 @@ export const VariantComparison: Story = {
 };
 
 export const SizeComparison: Story = {
+  args: {
+    children: "比較用ボタン",
+  },
   render: () => (
     <div className="flex items-center space-x-4">
       <Button size="small" variant="primary">小</Button>
@@ -153,6 +159,9 @@ export const SizeComparison: Story = {
 };
 
 export const RealWorldExample: Story = {
+  args: {
+    children: "実例用ボタン",
+  },
   render: () => (
     <div className="w-80 space-y-4 p-6 bg-white rounded-lg shadow">
       <h3 className="text-lg font-semibold text-gray-800">ゲーム設定</h3>
