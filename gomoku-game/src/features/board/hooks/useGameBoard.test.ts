@@ -19,13 +19,41 @@ describe("useGameBoard", () => {
     });
   });
 
+  describe("石が置けるかの判定", () => {
+    it("空のセルには石を置ける", () => {
+      const { result } = renderHook(() => useGameBoard());
+
+      expect(result.current.canPlaceStone(7, 7)).toBe(true);
+      expect(result.current.canPlaceStone(0, 0)).toBe(true);
+      expect(result.current.canPlaceStone(14, 14)).toBe(true);
+    });
+
+    it("既に石が置かれているセルには石を置けない", () => {
+      const { result } = renderHook(() => useGameBoard());
+
+      act(() => {
+        result.current.placeStone(7, 7, "black");
+      });
+
+      expect(result.current.canPlaceStone(7, 7)).toBe(false);
+    });
+
+    it("範囲外の座標には石を置けない", () => {
+      const { result } = renderHook(() => useGameBoard());
+
+      expect(result.current.canPlaceStone(-1, 7)).toBe(false);
+      expect(result.current.canPlaceStone(7, -1)).toBe(false);
+      expect(result.current.canPlaceStone(15, 7)).toBe(false);
+      expect(result.current.canPlaceStone(7, 15)).toBe(false);
+    });
+  });
+
   describe("石の配置", () => {
     it("空のセルに黒石を配置できる", () => {
       const { result } = renderHook(() => useGameBoard());
 
       act(() => {
-        const success = result.current.placeStone(7, 7, "black");
-        expect(success).toBe(true);
+        result.current.placeStone(7, 7, "black");
       });
 
       expect(result.current.board[7][7]).toBe("black");
@@ -35,14 +63,13 @@ describe("useGameBoard", () => {
       const { result } = renderHook(() => useGameBoard());
 
       act(() => {
-        const success = result.current.placeStone(7, 7, "white");
-        expect(success).toBe(true);
+        result.current.placeStone(7, 7, "white");
       });
 
       expect(result.current.board[7][7]).toBe("white");
     });
 
-    it("既に石が置かれているセルには配置できない", () => {
+    it("既に石が置かれているセルに配置しようとしても状態は変わらない", () => {
       const { result } = renderHook(() => useGameBoard());
 
       act(() => {
@@ -50,27 +77,25 @@ describe("useGameBoard", () => {
       });
 
       act(() => {
-        const success = result.current.placeStone(7, 7, "white");
-        expect(success).toBe(false);
+        result.current.placeStone(7, 7, "white");
       });
 
       expect(result.current.board[7][7]).toBe("black");
     });
 
-    it("範囲外の座標には配置できない", () => {
+    it("範囲外の座標に配置しようとしてもボードは変わらない", () => {
       const { result } = renderHook(() => useGameBoard());
+      
+      const initialBoard = result.current.board;
 
       act(() => {
-        const success1 = result.current.placeStone(-1, 7, "black");
-        const success2 = result.current.placeStone(7, -1, "black");
-        const success3 = result.current.placeStone(15, 7, "black");
-        const success4 = result.current.placeStone(7, 15, "black");
-
-        expect(success1).toBe(false);
-        expect(success2).toBe(false);
-        expect(success3).toBe(false);
-        expect(success4).toBe(false);
+        result.current.placeStone(-1, 7, "black");
+        result.current.placeStone(7, -1, "black");
+        result.current.placeStone(15, 7, "black");
+        result.current.placeStone(7, 15, "black");
       });
+
+      expect(result.current.board).toEqual(initialBoard);
     });
   });
 
@@ -127,16 +152,16 @@ describe("useGameBoard", () => {
     it("ボードの四隅に石を配置できる", () => {
       const { result } = renderHook(() => useGameBoard());
 
-      act(() => {
-        const corner1 = result.current.placeStone(0, 0, "black");
-        const corner2 = result.current.placeStone(0, 14, "white");
-        const corner3 = result.current.placeStone(14, 0, "black");
-        const corner4 = result.current.placeStone(14, 14, "white");
+      expect(result.current.canPlaceStone(0, 0)).toBe(true);
+      expect(result.current.canPlaceStone(0, 14)).toBe(true);
+      expect(result.current.canPlaceStone(14, 0)).toBe(true);
+      expect(result.current.canPlaceStone(14, 14)).toBe(true);
 
-        expect(corner1).toBe(true);
-        expect(corner2).toBe(true);
-        expect(corner3).toBe(true);
-        expect(corner4).toBe(true);
+      act(() => {
+        result.current.placeStone(0, 0, "black");
+        result.current.placeStone(0, 14, "white");
+        result.current.placeStone(14, 0, "black");
+        result.current.placeStone(14, 14, "white");
       });
 
       expect(result.current.board[0][0]).toBe("black");
