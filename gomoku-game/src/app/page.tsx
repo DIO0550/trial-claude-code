@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useAutoRedirect } from "@/hooks/useAutoRedirect";
 
 export default function Home() {
-  const router = useRouter();
+  const { redirectTo } = useAutoRedirect();
 
   useEffect(() => {
-    router.push("/start");
-  }, [router]);
+    redirectTo("/start");
+  }, [redirectTo]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">

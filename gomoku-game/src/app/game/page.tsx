@@ -1,27 +1,24 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import GameBoard from "@/features/game/components/GameBoard/GameBoard";
 import { StoneColor } from "@/features/board/utils/stone";
 import { CpuLevel } from "@/features/cpu/utils/cpuLevel";
+import { useBackToStart } from "@/hooks/useBackToStart";
 
 function GamePageContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
+  const { backToStart } = useBackToStart();
   
   const cpuLevel = (searchParams.get("cpuLevel") as CpuLevel) || "normal";
   const playerColor = (searchParams.get("color") as StoneColor) || "black";
-
-  const handleBackToStart = () => {
-    router.push("/start");
-  };
 
   return (
     <GameBoard
       cpuLevel={cpuLevel}
       playerColor={playerColor}
-      onBackToStart={handleBackToStart}
+      onBackToStart={backToStart}
     />
   );
 }

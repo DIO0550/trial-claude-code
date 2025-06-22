@@ -1,19 +1,15 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import GameSetup from "@/features/game/components/GameSetup/GameSetup";
 import { StoneColor } from "@/features/board/utils/stone";
 import { CpuLevel } from "@/features/cpu/utils/cpuLevel";
+import { useGameNavigation } from "@/hooks/useGameNavigation";
 
 export default function StartPage() {
-  const router = useRouter();
+  const { navigateToGame } = useGameNavigation();
 
   const handleStartGame = (cpuLevel: CpuLevel, color: StoneColor) => {
-    const params = new URLSearchParams({
-      cpuLevel,
-      color: color || "black"
-    });
-    router.push(`/game?${params.toString()}`);
+    navigateToGame(cpuLevel, color);
   };
 
   return <GameSetup onStartGame={handleStartGame} />;
