@@ -1,0 +1,142 @@
+{
+  "permissions": {
+    "allow": [
+      // テスト実行関連
+      "Bash(npm test)",
+      "Bash(npm run test:*)",
+      "Bash(npm run test unit)",
+      "Bash(npm run test integration)",
+      "Bash(npm run test watch)",
+      "Bash(yarn test)",
+      "Bash(pnpm test)",
+
+      // Git状態確認（読み取り専用操作）
+      "Bash(git status)",
+      "Bash(git log)",
+      "Bash(git diff)",
+      "Bash(git show)",
+      "Bash(git branch)",
+      "Bash(git remote)",
+      "Bash(git blame)",
+
+      // ファイル・ディレクトリの読み取り
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(grep *)",
+      "Bash(find *)",
+      "Bash(pwd *)",
+      "Bash(echo *)",
+
+      // 検索系ツール
+      "Bash(rg *)", // ripgrep
+
+      // パッケージ情報の確認
+      "Bash(npm list)",
+      "Bash(npm outdated)",
+      "Bash(npm audit)",
+      "Bash(npm info)",
+      "Bash(yarn list)",
+      "Bash(pnpm list)",
+
+      // ビルド・リント（出力のみ）
+      "Bash(npm run build)",
+      "Bash(npm run lint)",
+      "Bash(npm run type-check)",
+      "Bash(eslint *)",
+      "Bash(tsc --noEmit)",
+
+      // バージョン確認
+      "Bash(node --version)",
+      "Bash(npm --version)",
+      "Bash(yarn --version)",
+      "Bash(git --version)",
+
+      // JSON処理
+      "Bash(jq *)",
+
+      // ファイル・ディレクトリの作成
+      "Bash(mkdir *)",
+      "Bash(touch *)",
+
+      // VSCode操作
+      "Bash(code *)",
+
+      // API通信（GET系のみ）
+      "Bash(curl -X GET)",
+      "Bash(curl --get)",
+
+      // Web参照許可ドメイン
+      "WebFetch(domain github.com)",
+      "WebFetch(domain docs.anthropic.com)",
+      "WebFetch(domain stackoverflow.com)",
+      "WebFetch(domain developer.mozilla.org)",
+      "WebFetch(domain npmjs.com)",
+      "WebFetch(domain nodejs.org)",
+      "WebFetch(domain typescript.org)"
+    ],
+
+    "deny": [
+      // ファイル・ディレクトリの変更・削除
+      "Bash(rmdir *)",
+      "Bash(rm *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(chmod *)",
+      "Bash(chown *)",
+
+      // ファイル編集
+      "Bash(vim *)",
+      "Bash(nano *)",
+      "Bash(emacs *)",
+
+      // Git操作（変更を伴うもの）
+      "Bash(git add)",
+      "Bash(git commit)",
+      "Bash(git push)",
+      "Bash(git pull)",
+      "Bash(git merge)",
+      "Bash(git rebase)",
+      "Bash(git checkout)",
+      "Bash(git reset)",
+      "Bash(git stash)",
+      "Bash(git cherry-pick)",
+      "Bash(git tag)",
+
+      // パッケージのインストール・変更
+      "Bash(npm install)",
+      "Bash(npm uninstall)",
+      "Bash(npm update)",
+      "Bash(npm publish)",
+      "Bash(yarn install)",
+      "Bash(yarn add)",
+      "Bash(yarn remove)",
+      "Bash(pnpm install)",
+      "Bash(pnpm add)",
+      "Bash(pnpm remove)",
+
+      // システム変更
+      "Bash(sudo *)",
+      "Bash(su *)",
+      "Bash(passwd *)",
+      "Bash(systemctl *)",
+      "Bash(service *)",
+
+      // 破壊的コマンド
+      "Bash(rm -rf)",
+      "Bash(dd *)",
+      "Bash(format *)",
+      "Bash(fdisk *)",
+
+      // ネットワーク変更操作
+      "Bash(curl -X POST)",
+      "Bash(curl -X PUT)",
+      "Bash(curl -X DELETE)",
+      "Bash(wget *)"
+    ]
+  },
+  "confirmations": {
+    "vscodeOpen": false
+  }
+}
