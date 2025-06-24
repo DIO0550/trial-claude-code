@@ -87,4 +87,41 @@ describe("Board", () => {
       });
     });
   });
+
+  describe("isEmpty", () => {
+    it("空のボードに対してtrueを返す", () => {
+      const board = Board.createEmpty();
+      
+      expect(Board.isEmpty(board)).toBe(true);
+    });
+
+    it("石が1つでも置かれたボードに対してfalseを返す", () => {
+      const board = Board.createEmpty();
+      board[7][7] = "black";
+      
+      expect(Board.isEmpty(board)).toBe(false);
+    });
+
+    it("複数の石が置かれたボードに対してfalseを返す", () => {
+      const board = Board.createEmpty();
+      board[7][7] = "black";
+      board[7][8] = "white";
+      board[8][7] = "black";
+      
+      expect(Board.isEmpty(board)).toBe(false);
+    });
+
+    it("全ての位置に石が置かれたボードに対してfalseを返す", () => {
+      const board = Board.createEmpty();
+      
+      // 全ての位置に石を配置
+      for (let row = 0; row < 15; row++) {
+        for (let col = 0; col < 15; col++) {
+          board[row][col] = (row + col) % 2 === 0 ? "black" : "white";
+        }
+      }
+      
+      expect(Board.isEmpty(board)).toBe(false);
+    });
+  });
 });

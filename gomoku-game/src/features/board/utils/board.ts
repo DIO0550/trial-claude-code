@@ -28,4 +28,8 @@ export const Board = {
     newBoard[row][col] = color;
     return newBoard;
   },
+
+  isEmpty: (board: Board): boolean => {
+    return board.flat().every(cell => StoneColor.isNone(cell));
+  },
 } as const;

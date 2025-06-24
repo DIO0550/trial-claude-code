@@ -166,4 +166,143 @@ describe("EasyCpuPlayer", () => {
       }
     });
   });
+
+  describe("対戦感向上のテスト", () => {
+    test("初手（空盤面）では中央付近（7±2範囲）に配置する", () => {
+      const player = createEasyCpuPlayer("black");
+      const board = Board.createEmpty();
+      const moveHistory: Position[] = [];
+
+      // Board.isEmptyがtrueであることを確認
+      expect(Board.isEmpty(board)).toBe(true);
+
+      // 複数回テストして、すべて中央付近（7±2の範囲）に配置されることを確認
+      for (let i = 0; i < 10; i++) {
+        const move = player.calculateNextMove(board, moveHistory);
+        
+        expect(move).not.toBeNull();
+        expect(move!.row).toBeGreaterThanOrEqual(5); // 7-2
+        expect(move!.row).toBeLessThanOrEqual(9);    // 7+2
+        expect(move!.col).toBeGreaterThanOrEqual(5); // 7-2
+        expect(move!.col).toBeLessThanOrEqual(9);    // 7+2
+      }
+    });
+
+    test("勝利・防御手がない場合、プレイヤーの石の近く（2-3マス以内）に配置する", () => {
+      const player = createEasyCpuPlayer("black");
+      
+      // 複数回テストして、プレイヤーの石から2-3マス以内に配置されることを確認
+      let proximityCount = 0;
+      const testRuns = 20;
+
+      for (let i = 0; i < testRuns; i++) {
+        const testBoard = Board.createEmpty();
+        // プレイヤー（白）の石を配置（勝利・防御に関係ない位置）
+        testBoard[5][5] = "white";
+        testBoard[9][9] = "white";
+        const moveHistory: Position[] = [
+          { row: 5, col: 5 },
+          { row: 9, col: 9 }
+        ];
+        
+        const move = player.calculateNextMove(testBoard, moveHistory);
+        
+        expect(move).not.toBeNull();
+        
+        // どちらかの白石から3マス以内かチェック
+        const row1Distance = Math.abs(move!.row - 5);
+        const col1Distance = Math.abs(move!.col - 5);
+        const row2Distance = Math.abs(move!.row - 9);
+        const col2Distance = Math.abs(move!.col - 9);
+        
+        const isNearFirst = row1Distance <= 3 && col1Distance <= 3;
+        const isNearSecond = row2Distance <= 3 && col2Distance <= 3;
+        
+        if (isNearFirst || isNearSecond) {
+          proximityCount++;
+        }
+      }
+
+      // 70%以上は近接位置に配置されるべき（EasyはBeginnerより少し低め）
+      expect(proximityCount / testRuns).toBeGreaterThan(0.7);
+    });
+
+    test("勝利手が優先される（近接配置より優先度が高い）", () => {
+      const player = createEasyCpuPlayer("white");
+      const board = Board.createEmpty();
+      
+      // 自分（白）の勝利手を作成
+      board[7][3] = "white";
+      board[7][4] = "white";
+      board[7][5] = "white";
+      board[7][6] = "white";
+      // 勝利位置: (7,2) または (7,7)
+      
+      // プレイヤー（黒）の石を離れた場所に配置
+      board[1][1] = "black";
+      
+      const moveHistory: Position[] = [];
+      const move = player.calculateNextMove(board, moveHistory);
+
+      expect(move).not.toBeNull();
+      // 勝利手を優先（近接配置よりも優先度が高い）
+      expect(
+        (move!.row === 7 && move!.col === 2) || 
+        (move!.row === 7 && move!.col === 7)
+      ).toBe(true);
+    });
+
+    test("防御手が優先される（近接配置より優先度が高い）", () => {
+      const player = createEasyCpuPlayer("white");
+      const board = Board.createEmpty();
+      
+      // 相手（黒）の脅威を作成
+      board[7][3] = "black";
+      board[7][4] = "black";
+      board[7][5] = "black";
+      board[7][6] = "black";
+      // 阻止位置: (7,2) または (7,7)
+      
+      // 自分（白）の石を離れた場所に配置
+      board[1][1] = "white";
+      
+      const moveHistory: Position[] = [];
+      const move = player.calculateNextMove(board, moveHistory);
+
+      expect(move).not.toBeNull();
+      // 防御手を優先（近接配置よりも優先度が高い）
+      expect(
+        (move!.row === 7 && move!.col === 2) || 
+        (move!.row === 7 && move!.col === 7)
+      ).toBe(true);
+    });
+
+    test("近接位置がない場合はフォールバックでランダム配置する", () => {
+      const player = createEasyCpuPlayer("black");
+      const board = Board.createEmpty();
+      
+      // プレイヤーの石を角に配置し、周囲を埋める（近接位置を作らない）
+      board[0][0] = "white";
+      // 周囲3マス以内をすべて埋める
+      for (let row = 0; row <= 3; row++) {
+        for (let col = 0; col <= 3; col++) {
+          if (!(row === 0 && col === 0)) {
+            board[row][col] = "black";
+          }
+        }
+      }
+      
+      const moveHistory: Position[] = [{ row: 0, col: 0 }];
+      const move = player.calculateNextMove(board, moveHistory);
+
+      expect(move).not.toBeNull();
+      expect(Position.isValid(move!)).toBe(true);
+      expect(board[move!.row][move!.col]).toBe("none");
+      
+      // 近接範囲外に配置されることを確認
+      const rowDistance = Math.abs(move!.row - 0);
+      const colDistance = Math.abs(move!.col - 0);
+      expect(rowDistance > 3 || colDistance > 3).toBe(true);
+    });
+  });
 });
