@@ -124,4 +124,42 @@ describe("Board", () => {
       expect(Board.isEmpty(board)).toBe(false);
     });
   });
+
+  describe("getStonePositions", () => {
+    it("指定された色の石の位置を全て取得する", () => {
+      const board = Board.createEmpty();
+      board[7][7] = "black";
+      board[8][8] = "black";
+      board[9][9] = "white";
+      
+      const blackPositions = Board.getStonePositions(board, "black");
+      const whitePositions = Board.getStonePositions(board, "white");
+      
+      expect(blackPositions).toHaveLength(2);
+      expect(blackPositions).toContainEqual({ row: 7, col: 7 });
+      expect(blackPositions).toContainEqual({ row: 8, col: 8 });
+      
+      expect(whitePositions).toHaveLength(1);
+      expect(whitePositions).toContainEqual({ row: 9, col: 9 });
+    });
+
+    it("該当する色の石がない場合は空配列を返す", () => {
+      const board = Board.createEmpty();
+      board[7][7] = "black";
+      
+      const whitePositions = Board.getStonePositions(board, "white");
+      const nonePositions = Board.getStonePositions(board, "none");
+      
+      expect(whitePositions).toHaveLength(0);
+      expect(nonePositions.length).toBeGreaterThan(0); // 空きマスは多数ある
+    });
+
+    it("空のボードで'none'を指定すると全位置を返す", () => {
+      const board = Board.createEmpty();
+      
+      const nonePositions = Board.getStonePositions(board, "none");
+      
+      expect(nonePositions).toHaveLength(15 * 15);
+    });
+  });
 });

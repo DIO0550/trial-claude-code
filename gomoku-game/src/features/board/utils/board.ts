@@ -1,4 +1,5 @@
 import { StoneColor } from "@/features/board/utils/stone";
+import { Position } from "@/features/board/utils/position";
 import { BOARD_SIZE, MIN_COORDINATE, MAX_COORDINATE } from "@/features/board/constants/dimensions";
 
 export type Board = (StoneColor)[][];
@@ -31,5 +32,19 @@ export const Board = {
 
   isEmpty: (board: Board): boolean => {
     return board.flat().every(cell => StoneColor.isNone(cell));
+  },
+
+  getStonePositions: (board: Board, color: StoneColor): Position[] => {
+    const positions: Position[] = [];
+    
+    for (let row = 0; row < BOARD_SIZE; row++) {
+      for (let col = 0; col < BOARD_SIZE; col++) {
+        if (board[row][col] === color) {
+          positions.push({ row, col });
+        }
+      }
+    }
+    
+    return positions;
   },
 } as const;

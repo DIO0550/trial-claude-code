@@ -30,7 +30,7 @@ describe("NormalCpuPlayer", () => {
 
   describe("手計算", () => {
     describe("基本動作", () => {
-      test("空のボードでは中央に手を打つ", () => {
+      test("空のボードでは中央付近に手を打つ", () => {
         const player = createNormalCpuPlayer("white");
         const emptyBoard: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
         const moveHistory: Position[] = [];
@@ -38,7 +38,13 @@ describe("NormalCpuPlayer", () => {
         const move = player.calculateNextMove(emptyBoard, moveHistory);
 
         expect(move).not.toBeNull();
-        expect(move).toEqual({ row: 7, col: 7 });
+        if (move) {
+          // 中央付近（7±2の範囲）に配置される
+          expect(move.row).toBeGreaterThanOrEqual(5);
+          expect(move.row).toBeLessThanOrEqual(9);
+          expect(move.col).toBeGreaterThanOrEqual(5);
+          expect(move.col).toBeLessThanOrEqual(9);
+        }
       });
 
       test("すべてのマスが埋まっている場合はnullを返す", () => {
@@ -364,6 +370,67 @@ describe("NormalCpuPlayer", () => {
           expect(move.row).toBeLessThan(15);
           expect(move.col).toBeGreaterThanOrEqual(0);
           expect(move.col).toBeLessThan(15);
+        }
+      });
+    });
+
+    describe("近接評価テスト", () => {
+      test("プレイヤーの石の近くを優先して配置する", () => {
+        const player = createNormalCpuPlayer("white");
+        const board: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
+        
+        // プレイヤー（黒石）の石を配置
+        board[7][7] = "black";
+        
+        // 序盤定石を無効化するため6手以上の履歴を作成
+        const moveHistory: Position[] = Array(7).fill(null).map((_, i) => ({ row: i, col: 0 }));
+
+        const move = player.calculateNextMove(board, moveHistory);
+
+        expect(move).not.toBeNull();
+        if (move) {
+          // プレイヤーの石（7,7）から距離3以内に配置される
+          const distance = Math.abs(move.row - 7) + Math.abs(move.col - 7);
+          expect(distance).toBeLessThanOrEqual(3);
+        }
+      });
+
+      test("複数のプレイヤー石がある場合、いずれかの近くに配置する", () => {
+        const player = createNormalCpuPlayer("white");
+        const board: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
+        
+        // プレイヤー（黒石）の石を複数配置
+        board[3][3] = "black";
+        board[11][11] = "black";
+        
+        // 序盤定石を無効化するため6手以上の履歴を作成
+        const moveHistory: Position[] = Array(7).fill(null).map((_, i) => ({ row: i, col: 0 }));
+
+        const move = player.calculateNextMove(board, moveHistory);
+
+        expect(move).not.toBeNull();
+        if (move) {
+          // いずれかのプレイヤー石から距離3以内に配置される
+          const distance1 = Math.abs(move.row - 3) + Math.abs(move.col - 3);
+          const distance2 = Math.abs(move.row - 11) + Math.abs(move.col - 11);
+          expect(distance1 <= 3 || distance2 <= 3).toBe(true);
+        }
+      });
+
+      test("初手時は中央付近（7±2）に配置する", () => {
+        const player = createNormalCpuPlayer("white");
+        const board: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
+        const moveHistory: Position[] = [];
+
+        const move = player.calculateNextMove(board, moveHistory);
+
+        expect(move).not.toBeNull();
+        if (move) {
+          // 中央付近（7±2の範囲）に配置される
+          expect(move.row).toBeGreaterThanOrEqual(5);
+          expect(move.row).toBeLessThanOrEqual(9);
+          expect(move.col).toBeGreaterThanOrEqual(5);
+          expect(move.col).toBeLessThanOrEqual(9);
         }
       });
     });

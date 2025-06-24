@@ -32,6 +32,14 @@ const EVALUATION_SCORES = {
   BLOCK_THREE: 50,
   TWO: 10,
   CENTER: 5,
+  PROXIMITY_BASE: 20,
+  PROXIMITY_MAX: 60,
+} as const;
+
+// 近接評価定数
+const PROXIMITY_CONSTANTS = {
+  MAX_DISTANCE: 3,
+  CENTER_RANGE: 2,
 } as const;
 
 // 序盤定石位置
@@ -189,6 +197,65 @@ const calculateConsecutiveCounts = (
 };
 
 /**
+ * 指定位置から最も近いプレイヤーの石までの距離を計算する
+ * @param position - 評価する位置
+ * @param playerPositions - プレイヤーの石の位置の配列
+ * @returns 最も近い石までのマンハッタン距離（石がない場合はInfinity）
+ * @example
+ * ```typescript
+ * const distance = calculateMinDistanceToPlayer(
+ *   { row: 7, col: 7 },
+ *   [{ row: 5, col: 5 }, { row: 9, col: 9 }]
+ * ); // 4
+ * ```
+ */
+const calculateMinDistanceToPlayer = (
+  position: Position,
+  playerPositions: Position[]
+): number => {
+  if (playerPositions.length === 0) {
+    return Infinity;
+  }
+  
+  let minDistance = Infinity;
+  for (const playerPos of playerPositions) {
+    const distance = Math.abs(position.row - playerPos.row) + Math.abs(position.col - playerPos.col);
+    minDistance = Math.min(minDistance, distance);
+  }
+  
+  return minDistance;
+};
+
+/**
+ * 近接ボーナスを計算する
+ * @param position - 評価する位置
+ * @param playerPositions - プレイヤーの石の位置の配列
+ * @returns 近接ボーナス値
+ * @example
+ * ```typescript
+ * const bonus = calculateProximityBonus(
+ *   { row: 7, col: 7 },
+ *   [{ row: 5, col: 5 }]
+ * );
+ * ```
+ */
+const calculateProximityBonus = (
+  position: Position,
+  playerPositions: Position[]
+): number => {
+  const minDistance = calculateMinDistanceToPlayer(position, playerPositions);
+  
+  if (minDistance === Infinity || minDistance > PROXIMITY_CONSTANTS.MAX_DISTANCE) {
+    return 0;
+  }
+  
+  // 距離に応じたボーナス計算（近いほど高い）
+  const distanceRatio = (PROXIMITY_CONSTANTS.MAX_DISTANCE - minDistance) / PROXIMITY_CONSTANTS.MAX_DISTANCE;
+  return EVALUATION_SCORES.PROXIMITY_BASE + 
+         (EVALUATION_SCORES.PROXIMITY_MAX - EVALUATION_SCORES.PROXIMITY_BASE) * distanceRatio;
+};
+
+/**
  * 指定位置に石を置いた場合の評価値を計算する
  * @param board - ゲームボード
  * @param position - 評価する位置
@@ -241,6 +308,11 @@ const evaluatePosition = (
     score += EVALUATION_SCORES.CENTER * (GAME_CONSTANTS.CENTER_RADIUS - distanceFromCenter + 1);
   }
   
+  // 近接ボーナス（プレイヤーの石の近くを重点評価）
+  const playerPositions = Board.getStonePositions(board, opponentColor);
+  const proximityBonus = calculateProximityBonus(position, playerPositions);
+  score += proximityBonus;
+  
   return score;
 };
 
@@ -285,6 +357,41 @@ const findCriticalMove = (
 };
 
 /**
+ * 初手時の中央付近の位置を取得する（7±2の範囲）
+ * @param board - ゲームボード
+ * @returns 中央付近の空き位置（ランダム選択）、なければnull
+ * @example
+ * ```typescript
+ * const centerMove = getInitialCenterMove(board);
+ * ```
+ */
+const getInitialCenterMove = (board: Board): Position | null => {
+  const center = Math.floor(BOARD_SIZE / 2);
+  const availablePositions: Position[] = [];
+  
+  // 中央付近（7±2）の空き位置を収集
+  for (let row = center - PROXIMITY_CONSTANTS.CENTER_RANGE; row <= center + PROXIMITY_CONSTANTS.CENTER_RANGE; row++) {
+    for (let col = center - PROXIMITY_CONSTANTS.CENTER_RANGE; col <= center + PROXIMITY_CONSTANTS.CENTER_RANGE; col++) {
+      if (
+        row >= 0 && row < BOARD_SIZE &&
+        col >= 0 && col < BOARD_SIZE &&
+        StoneColor.isNone(board[row][col])
+      ) {
+        availablePositions.push({ row, col });
+      }
+    }
+  }
+  
+  if (availablePositions.length === 0) {
+    return null;
+  }
+  
+  // ランダムに選択
+  const randomIndex = Math.floor(Math.random() * availablePositions.length);
+  return availablePositions[randomIndex];
+};
+
+/**
  * 序盤の定石配置を取得する
  * @param board - ゲームボード
  * @param moveHistory - 手順履歴
@@ -301,9 +408,9 @@ const getOpeningMove = (board: Board, moveHistory: Position[]): Position | null 
   
   const center = Math.floor(BOARD_SIZE / 2);
   
-  // 最初の手は中央
+  // 最初の手は中央付近（7±2）
   if (moveHistory.length === 0) {
-    return { row: center, col: center };
+    return getInitialCenterMove(board);
   }
   
   // 2手目以降は中央周辺の良い位置
