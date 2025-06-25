@@ -47,4 +47,33 @@ export const Board = {
     
     return positions;
   },
+
+  getNearbyPositions: (centerPosition: Position, radius: number): Position[] => {
+    const positions: Position[] = [];
+    
+    for (let dr = -radius; dr <= radius; dr++) {
+      for (let dc = -radius; dc <= radius; dc++) {
+        const row = centerPosition.row + dr;
+        const col = centerPosition.col + dc;
+        
+        if (Board.isValidPosition(row, col)) {
+          positions.push({ row, col });
+        }
+      }
+    }
+    
+    // 中央からの距離順にソート
+    positions.sort((a, b) => {
+      const distA = Math.abs(a.row - centerPosition.row) + Math.abs(a.col - centerPosition.col);
+      const distB = Math.abs(b.row - centerPosition.row) + Math.abs(b.col - centerPosition.col);
+      return distA - distB;
+    });
+    
+    return positions;
+  },
+
+  getCenterPosition: (): Position => {
+    const center = Math.floor(BOARD_SIZE / 2);
+    return { row: center, col: center };
+  },
 } as const;

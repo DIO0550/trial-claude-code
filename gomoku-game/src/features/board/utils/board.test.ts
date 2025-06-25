@@ -162,4 +162,89 @@ describe("Board", () => {
       expect(nonePositions).toHaveLength(15 * 15);
     });
   });
+
+  describe("getNearbyPositions", () => {
+    it("指定位置から半径1の近接位置を取得する", () => {
+      const centerPosition = { row: 7, col: 7 };
+      const nearbyPositions = Board.getNearbyPositions(centerPosition, 1);
+      
+      // 3x3 = 9個の位置が返される
+      expect(nearbyPositions).toHaveLength(9);
+      
+      // 中央が最初に来る（距離0）
+      expect(nearbyPositions[0]).toEqual({ row: 7, col: 7 });
+      
+      // 距離1の位置が含まれる
+      expect(nearbyPositions).toContainEqual({ row: 6, col: 7 });
+      expect(nearbyPositions).toContainEqual({ row: 8, col: 7 });
+      expect(nearbyPositions).toContainEqual({ row: 7, col: 6 });
+      expect(nearbyPositions).toContainEqual({ row: 7, col: 8 });
+    });
+
+    it("指定位置から半径2の近接位置を取得する", () => {
+      const centerPosition = { row: 7, col: 7 };
+      const nearbyPositions = Board.getNearbyPositions(centerPosition, 2);
+      
+      // 5x5 = 25個の位置が返される
+      expect(nearbyPositions).toHaveLength(25);
+      
+      // 中央が最初に来る
+      expect(nearbyPositions[0]).toEqual({ row: 7, col: 7 });
+      
+      // 半径2の範囲が含まれる
+      expect(nearbyPositions).toContainEqual({ row: 5, col: 7 });
+      expect(nearbyPositions).toContainEqual({ row: 9, col: 7 });
+      expect(nearbyPositions).toContainEqual({ row: 7, col: 5 });
+      expect(nearbyPositions).toContainEqual({ row: 7, col: 9 });
+    });
+
+    it("ボード端での近接位置を取得する（範囲外は除外される）", () => {
+      const cornerPosition = { row: 0, col: 0 };
+      const nearbyPositions = Board.getNearbyPositions(cornerPosition, 1);
+      
+      // 角なので4個のみ（3x3のうち4個が有効）
+      expect(nearbyPositions).toHaveLength(4);
+      
+      // 有効な位置のみ含まれる
+      expect(nearbyPositions).toContainEqual({ row: 0, col: 0 });
+      expect(nearbyPositions).toContainEqual({ row: 0, col: 1 });
+      expect(nearbyPositions).toContainEqual({ row: 1, col: 0 });
+      expect(nearbyPositions).toContainEqual({ row: 1, col: 1 });
+    });
+
+    it("距離順にソートされる", () => {
+      const centerPosition = { row: 7, col: 7 };
+      const nearbyPositions = Board.getNearbyPositions(centerPosition, 2);
+      
+      // 距離を計算して順序を確認
+      for (let i = 1; i < nearbyPositions.length; i++) {
+        const prevDistance = Math.abs(nearbyPositions[i-1].row - 7) + Math.abs(nearbyPositions[i-1].col - 7);
+        const currentDistance = Math.abs(nearbyPositions[i].row - 7) + Math.abs(nearbyPositions[i].col - 7);
+        expect(currentDistance).toBeGreaterThanOrEqual(prevDistance);
+      }
+    });
+
+    it("半径0では中央のみを返す", () => {
+      const centerPosition = { row: 5, col: 5 };
+      const nearbyPositions = Board.getNearbyPositions(centerPosition, 0);
+      
+      expect(nearbyPositions).toHaveLength(1);
+      expect(nearbyPositions[0]).toEqual({ row: 5, col: 5 });
+    });
+  });
+
+  describe("getCenterPosition", () => {
+    it("ボードの中央位置を返す", () => {
+      const center = Board.getCenterPosition();
+      
+      expect(center).toEqual({ row: 7, col: 7 });
+    });
+
+    it("常に同じ位置を返す", () => {
+      const center1 = Board.getCenterPosition();
+      const center2 = Board.getCenterPosition();
+      
+      expect(center1).toEqual(center2);
+    });
+  });
 });

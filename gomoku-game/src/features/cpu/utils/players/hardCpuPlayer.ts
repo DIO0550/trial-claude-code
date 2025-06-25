@@ -410,6 +410,69 @@ const evaluateTerritoryControl = (
 };
 
 /**
+ * 戦略的近接評価スコアを計算する（Hard版）
+ * プレイヤーの戦略を予測した近接配置を評価
+ */
+const evaluateStrategicProximity = (
+  board: Board,
+  position: Position,
+  color: StoneColor,
+  opponentColor: StoneColor
+): number => {
+  let proximityScore = 0;
+  
+  // プレイヤーの石の位置を取得
+  const playerPositions = Board.getStonePositions(board, opponentColor);
+  
+  if (playerPositions.length === 0) {
+    return 0;
+  }
+  
+  // プレイヤーの石からの最短距離を計算
+  let minDistance = Infinity;
+  for (const playerPos of playerPositions) {
+    const distance = Math.abs(position.row - playerPos.row) + Math.abs(position.col - playerPos.col);
+    minDistance = Math.min(minDistance, distance);
+  }
+  
+  // 距離2以内で高評価（仕様書に従い距離2以内を重視）
+  if (minDistance <= 2) {
+    proximityScore += EVALUATION_SCORES.TERRITORY * (20 - minDistance * 3); // ボーナスを大きく
+  }
+  
+  // プレイヤーの連続形成を阻害する位置での近接ボーナス
+  for (const playerPos of playerPositions) {
+    const consecutiveCounts = calculateConsecutiveCounts(board, playerPos, opponentColor);
+    
+    for (const count of consecutiveCounts) {
+      if (count >= GAME_CONSTANTS.THREE_LENGTH) {
+        const distanceToThreat = Math.abs(position.row - playerPos.row) + Math.abs(position.col - playerPos.col);
+        if (distanceToThreat <= 2) {
+          proximityScore += EVALUATION_SCORES.TERRITORY * 50; // プレイヤーの連続阻害での近接ボーナス
+        }
+      }
+    }
+  }
+  
+  // フォーク形成可能位置での戦略的近接ボーナス
+  const myPositions = Board.getStonePositions(board, color);
+  for (const myPos of myPositions) {
+    const distanceToMy = Math.abs(position.row - myPos.row) + Math.abs(position.col - myPos.col);
+    if (distanceToMy <= 2) {
+      // 自分の石とプレイヤーの石の両方に近い場合、フォーク形成での戦略的価値
+      for (const playerPos of playerPositions) {
+        const distanceToPlayer = Math.abs(position.row - playerPos.row) + Math.abs(position.col - playerPos.col);
+        if (distanceToPlayer <= 2) {
+          proximityScore += EVALUATION_SCORES.TERRITORY * 80; // フォーク形成での近接ボーナス
+        }
+      }
+    }
+  }
+  
+  return proximityScore;
+};
+
+/**
  * 統合的な位置評価（責任分離版）
  */
 const evaluatePosition = (
@@ -422,7 +485,8 @@ const evaluatePosition = (
          evaluateDefensivePattern(board, position, opponentColor) +
          evaluateForkThreats(board, position, color, opponentColor) +
          evaluatePositionalBonus(position) +
-         evaluateTerritoryControl(board, position, color);
+         evaluateTerritoryControl(board, position, color) +
+         evaluateStrategicProximity(board, position, color, opponentColor);
 };
 
 /**
@@ -455,21 +519,27 @@ const findCriticalMove = (
 };
 
 /**
- * 序盤の定石配置を取得する
+ * 序盤の定石配置を取得する（Hard版：初手対応強化）
  */
 const getOpeningMove = (board: Board, moveHistory: Position[]): Position | null => {
   if (moveHistory.length >= GAME_CONSTANTS.EARLY_GAME_MOVE_COUNT) {
     return null;
   }
   
-  const center = Math.floor(BOARD_SIZE / 2);
-  
-  // 最初の手は中央
-  if (moveHistory.length === 0) {
-    return { row: center, col: center };
+  // 初手時：中央付近（7±2の範囲）を選択
+  if (Board.isEmpty(board)) {
+    const centerPosition = Board.getCenterPosition();
+    const centerNearbyPositions = Board.getNearbyPositions(centerPosition, 2);
+    
+    for (const position of centerNearbyPositions) {
+      if (StoneColor.isNone(board[position.row][position.col])) {
+        return position; // 中央に最も近い位置を返す
+      }
+    }
   }
   
   // 2手目以降は中央周辺の良い位置
+  const center = Math.floor(BOARD_SIZE / 2);
   for (const offset of OPENING_POSITIONS) {
     const position = { 
       row: center + offset.row, 

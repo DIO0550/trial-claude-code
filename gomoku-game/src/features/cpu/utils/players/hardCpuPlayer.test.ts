@@ -293,7 +293,86 @@ describe("HardCpuPlayer", () => {
       });
     });
 
-    describe("戦略的思考", () => {
+    describe("戦略的近接評価", () => {
+      test("プレイヤーの石の近くに配置する", () => {
+        const player = createHardCpuPlayer("white");
+        const board: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
+        
+        // プレイヤー（黒石）を端に配置
+        board[3][3] = "black";
+        
+        const moveHistory: Position[] = [
+          { row: 3, col: 3 }, { row: 7, col: 7 }, // 初手を無効化
+          { row: 0, col: 0 }, { row: 1, col: 1 },
+          { row: 2, col: 2 }, { row: 4, col: 4 },
+          { row: 5, col: 5 }, { row: 6, col: 6 }
+        ];
+
+        const move = player.calculateNextMove(board, moveHistory);
+
+        expect(move).not.toBeNull();
+        if (move) {
+          // プレイヤーの石から距離2以内に配置されることを確認
+          const distance = Math.abs(move.row - 3) + Math.abs(move.col - 3);
+          expect(distance).toBeLessThanOrEqual(2);
+        }
+      });
+
+      test("複数のプレイヤーの石がある場合、最も近い位置を選ぶ", () => {
+        const player = createHardCpuPlayer("white");
+        const board: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
+        
+        // プレイヤーの石を複数配置
+        board[2][2] = "black";
+        board[10][10] = "black";
+        board[5][5] = "white"; // CPU石も配置
+        
+        const moveHistory: Position[] = Array(8).fill(null).map((_, i) => ({ row: 0, col: i }));
+
+        const move = player.calculateNextMove(board, moveHistory);
+
+        expect(move).not.toBeNull();
+        if (move) {
+          // いずれかのプレイヤーの石から距離2以内
+          const distance1 = Math.abs(move.row - 2) + Math.abs(move.col - 2);
+          const distance2 = Math.abs(move.row - 10) + Math.abs(move.col - 10);
+          expect(Math.min(distance1, distance2)).toBeLessThanOrEqual(2);
+        }
+      });
+
+      test("フォーク形成での戦略的近接配置", () => {
+        const player = createHardCpuPlayer("white");
+        const board: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
+        
+        // プレイヤーの石を配置（フォーク阻害位置での近接を想定）
+        board[6][6] = "black";
+        board[6][7] = "black";
+        board[7][6] = "black";
+        
+        // 自分の石でフォーク準備
+        board[8][8] = "white";
+        board[9][9] = "white";
+        
+        const moveHistory: Position[] = Array(8).fill(null).map((_, i) => ({ row: 0, col: i }));
+
+        const move = player.calculateNextMove(board, moveHistory);
+
+        expect(move).not.toBeNull();
+        if (move) {
+          // プレイヤーの石またはフォーク形成位置の近くに配置
+          const playerDistance = Math.min(
+            Math.abs(move.row - 6) + Math.abs(move.col - 6),
+            Math.abs(move.row - 6) + Math.abs(move.col - 7),
+            Math.abs(move.row - 7) + Math.abs(move.col - 6)
+          );
+          const forkDistance = Math.min(
+            Math.abs(move.row - 8) + Math.abs(move.col - 8),
+            Math.abs(move.row - 9) + Math.abs(move.col - 9)
+          );
+          expect(Math.min(playerDistance, forkDistance)).toBeLessThanOrEqual(2);
+        }
+      });
+
       test("攻守のバランスを取る", () => {
         const player = createHardCpuPlayer("white");
         const board: Board = Array(15).fill(null).map(() => Array(15).fill("none"));
