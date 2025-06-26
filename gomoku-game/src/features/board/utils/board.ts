@@ -76,4 +76,62 @@ export const Board = {
     const center = Math.floor(BOARD_SIZE / 2);
     return { row: center, col: center };
   },
+
+  /**
+   * 指定位置から連続する同色の石の数を数える
+   * @param board ゲームボード
+   * @param position 基準となる位置
+   * @returns その位置を含む最大連続数
+   */
+  countConsecutiveStones: (board: Board, position: Position): number => {
+    const { row, col } = position;
+    const stoneColor = board[row][col];
+    
+    // 空の位置では0を返す
+    if (StoneColor.isNone(stoneColor)) {
+      return 0;
+    }
+    
+    // 4方向の検索ベクトル
+    const directions = [
+      [0, 1],   // 横（右方向）
+      [1, 0],   // 縦（下方向）  
+      [1, 1],   // 斜め（右下方向）
+      [1, -1]   // 斜め（右上方向）
+    ];
+    
+    let maxCount = 1; // 現在の石を含む最小値は1
+    
+    // 各方向について連続する石の数をカウント
+    for (const [dr, dc] of directions) {
+      let count = 1; // 現在の石を含む
+      
+      // 正方向に検索
+      for (let i = 1; i < BOARD_SIZE; i++) {
+        const newRow = row + dr * i;
+        const newCol = col + dc * i;
+        
+        if (!Board.isValidPosition(newRow, newCol) || board[newRow][newCol] !== stoneColor) {
+          break;
+        }
+        count++;
+      }
+      
+      // 逆方向に検索
+      for (let i = 1; i < BOARD_SIZE; i++) {
+        const newRow = row - dr * i;
+        const newCol = col - dc * i;
+        
+        if (!Board.isValidPosition(newRow, newCol) || board[newRow][newCol] !== stoneColor) {
+          break;
+        }
+        count++;
+      }
+      
+      // 最大値を更新
+      maxCount = Math.max(maxCount, count);
+    }
+    
+    return maxCount;
+  },
 } as const;

@@ -247,4 +247,164 @@ describe("Board", () => {
       expect(center1).toEqual(center2);
     });
   });
+
+  describe("countConsecutiveStones", () => {
+    describe("横方向の連続カウント", () => {
+      it("5つ連続で横に並んだ場合に5を返す", () => {
+        const board = Board.createEmpty();
+        
+        // 横に5つ黒石を配置 (7,3) から (7,7)
+        for (let col = 3; col <= 7; col++) {
+          board[7][col] = "black";
+        }
+        
+        const result = Board.countConsecutiveStones(board, { row: 7, col: 7 });
+        expect(result).toBe(5);
+      });
+
+      it("4つ連続で横に並んだ場合に4を返す", () => {
+        const board = Board.createEmpty();
+        
+        // 横に4つ黒石を配置
+        for (let col = 3; col <= 6; col++) {
+          board[7][col] = "black";
+        }
+        
+        const result = Board.countConsecutiveStones(board, { row: 7, col: 6 });
+        expect(result).toBe(4);
+      });
+
+      it("2つ連続で横に並んだ場合に2を返す", () => {
+        const board = Board.createEmpty();
+        
+        // 横に2つ黒石を配置
+        board[7][6] = "black";
+        board[7][7] = "black";
+        
+        const result = Board.countConsecutiveStones(board, { row: 7, col: 7 });
+        expect(result).toBe(2);
+      });
+    });
+
+    describe("縦方向の連続カウント", () => {
+      it("5つ連続で縦に並んだ場合に5を返す", () => {
+        const board = Board.createEmpty();
+        
+        // 縦に5つ白石を配置 (3,7) から (7,7)
+        for (let row = 3; row <= 7; row++) {
+          board[row][7] = "white";
+        }
+        
+        const result = Board.countConsecutiveStones(board, { row: 7, col: 7 });
+        expect(result).toBe(5);
+      });
+
+      it("3つ連続で縦に並んだ場合に3を返す", () => {
+        const board = Board.createEmpty();
+        
+        // 縦に3つ白石を配置
+        for (let row = 5; row <= 7; row++) {
+          board[row][7] = "white";
+        }
+        
+        const result = Board.countConsecutiveStones(board, { row: 7, col: 7 });
+        expect(result).toBe(3);
+      });
+    });
+
+    describe("斜め方向の連続カウント", () => {
+      it("右下方向に5つ連続で並んだ場合に5を返す", () => {
+        const board = Board.createEmpty();
+        
+        // 右下斜めに5つ黒石を配置 (3,3) から (7,7)
+        for (let i = 0; i < 5; i++) {
+          board[3 + i][3 + i] = "black";
+        }
+        
+        const result = Board.countConsecutiveStones(board, { row: 7, col: 7 });
+        expect(result).toBe(5);
+      });
+
+      it("右上方向に3つ連続で並んだ場合に3を返す", () => {
+        const board = Board.createEmpty();
+        
+        // 右上斜めに3つ白石を配置
+        for (let i = 0; i < 3; i++) {
+          board[7 - i][5 + i] = "white";
+        }
+        
+        const result = Board.countConsecutiveStones(board, { row: 5, col: 7 });
+        expect(result).toBe(3);
+      });
+    });
+
+    describe("連続しないケース", () => {
+      it("3つ連続の場合は3を返す", () => {
+        const board = Board.createEmpty();
+        
+        // 3つだけ配置
+        board[7][5] = "black";
+        board[7][6] = "black";
+        board[7][7] = "black";
+        
+        const result = Board.countConsecutiveStones(board, { row: 7, col: 7 });
+        expect(result).toBe(3);
+      });
+
+      it("間に異なる色が挟まっている場合は連続が途切れる", () => {
+        const board = Board.createEmpty();
+        
+        // 黒-黒-白-黒-黒の配置
+        board[7][3] = "black";
+        board[7][4] = "black";
+        board[7][5] = "white";
+        board[7][6] = "black";
+        board[7][7] = "black";
+        
+        const result = Board.countConsecutiveStones(board, { row: 7, col: 7 });
+        expect(result).toBe(2); // 右2つの黒石のみ
+      });
+
+      it("空のマスでは0を返す", () => {
+        const board = Board.createEmpty();
+        
+        const result = Board.countConsecutiveStones(board, { row: 7, col: 7 });
+        expect(result).toBe(0);
+      });
+
+      it("単独の石では1を返す", () => {
+        const board = Board.createEmpty();
+        board[7][7] = "black";
+        
+        const result = Board.countConsecutiveStones(board, { row: 7, col: 7 });
+        expect(result).toBe(1);
+      });
+    });
+
+    describe("ボード端での連続カウント", () => {
+      it("ボードの端で5つ連続した場合も5を返す", () => {
+        const board = Board.createEmpty();
+        
+        // ボード右端で縦に5つ配置
+        for (let row = 0; row < 5; row++) {
+          board[row][14] = "black";
+        }
+        
+        const result = Board.countConsecutiveStones(board, { row: 4, col: 14 });
+        expect(result).toBe(5);
+      });
+
+      it("ボードの左端で3つ連続した場合に3を返す", () => {
+        const board = Board.createEmpty();
+        
+        // ボード左端で横に3つ配置
+        for (let col = 0; col < 3; col++) {
+          board[7][col] = "white";
+        }
+        
+        const result = Board.countConsecutiveStones(board, { row: 7, col: 2 });
+        expect(result).toBe(3);
+      });
+    });
+  });
 });
