@@ -134,4 +134,13 @@ export const Board = {
     
     return maxCount;
   },
+
+  /**
+   * ボードが満杯かどうかを判定する
+   * @param board ゲームボード
+   * @returns ボードが満杯の場合true
+   */
+  isFull: (board: Board): boolean => {
+    return board.flat().every(cell => !StoneColor.isNone(cell));
+  },
 } as const;
