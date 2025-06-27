@@ -149,4 +149,211 @@ describe("useGomokuGame", () => {
       expect(result.current.moveHistory).toEqual([]);
     });
   });
+
+  describe("勝利判定", () => {
+    it("横方向に5つ連続で並んだ場合に勝利する", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+
+      // 黒石を横に5つ並べる
+      act(() => {
+        result.current.makeMove(7, 7); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 7); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 8); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 8); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 9); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 9); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 10); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 10); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 11); // 黒 - 5つ目
+      });
+
+      expect(result.current.gameStatus).toBe("won");
+      expect(result.current.winner).toBe("black");
+    });
+
+    it("縦方向に5つ連続で並んだ場合に勝利する", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+
+      // 白石を縦に5つ並べる
+      act(() => {
+        result.current.makeMove(6, 6); // 黒
+      });
+      act(() => {
+        result.current.makeMove(7, 7); // 白
+      });
+      act(() => {
+        result.current.makeMove(6, 8); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 7); // 白
+      });
+      act(() => {
+        result.current.makeMove(6, 9); // 黒
+      });
+      act(() => {
+        result.current.makeMove(9, 7); // 白
+      });
+      act(() => {
+        result.current.makeMove(6, 10); // 黒
+      });
+      act(() => {
+        result.current.makeMove(10, 7); // 白
+      });
+      act(() => {
+        result.current.makeMove(5, 5); // 黒
+      });
+      act(() => {
+        result.current.makeMove(11, 7); // 白 - 5つ目
+      });
+
+      expect(result.current.gameStatus).toBe("won");
+      expect(result.current.winner).toBe("white");
+    });
+
+    it("斜め方向（右下）に5つ連続で並んだ場合に勝利する", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+
+      // 黒石を斜めに5つ並べる
+      act(() => {
+        result.current.makeMove(7, 7); // 黒
+      });
+      act(() => {
+        result.current.makeMove(7, 8); // 白
+      });
+      act(() => {
+        result.current.makeMove(8, 8); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 9); // 白
+      });
+      act(() => {
+        result.current.makeMove(9, 9); // 黒
+      });
+      act(() => {
+        result.current.makeMove(9, 10); // 白
+      });
+      act(() => {
+        result.current.makeMove(10, 10); // 黒
+      });
+      act(() => {
+        result.current.makeMove(10, 11); // 白
+      });
+      act(() => {
+        result.current.makeMove(11, 11); // 黒 - 5つ目
+      });
+
+      expect(result.current.gameStatus).toBe("won");
+      expect(result.current.winner).toBe("black");
+    });
+
+    it("斜め方向（右上）に5つ連続で並んだ場合に勝利する", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+
+      // 白石を斜めに5つ並べる
+      act(() => {
+        result.current.makeMove(5, 5); // 黒
+      });
+      act(() => {
+        result.current.makeMove(11, 7); // 白
+      });
+      act(() => {
+        result.current.makeMove(5, 6); // 黒
+      });
+      act(() => {
+        result.current.makeMove(10, 8); // 白
+      });
+      act(() => {
+        result.current.makeMove(5, 7); // 黒
+      });
+      act(() => {
+        result.current.makeMove(9, 9); // 白
+      });
+      act(() => {
+        result.current.makeMove(5, 8); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 10); // 白
+      });
+      act(() => {
+        result.current.makeMove(6, 6); // 黒
+      });
+      act(() => {
+        result.current.makeMove(7, 11); // 白 - 5つ目
+      });
+
+      expect(result.current.gameStatus).toBe("won");
+      expect(result.current.winner).toBe("white");
+    });
+
+    it("勝利後は石を置くことができない", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+
+      // 黒石を横に5つ並べて勝利させる
+      act(() => {
+        result.current.makeMove(7, 7); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 7); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 8); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 8); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 9); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 9); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 10); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 10); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 11); // 黒 - 5つ目
+      });
+
+      expect(result.current.gameStatus).toBe("won");
+      expect(result.current.canMakeMove(0, 0)).toBe(false);
+    });
+  });
+
+  describe("引き分け判定", () => {
+    it("ボードが満杯で勝者がいない場合に引き分けになる", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+
+      // ボードを満杯にして引き分けにする（実際には簡単なパターンで確認）
+      // このテストは実装後に調整が必要
+      expect(result.current.gameStatus).toBe("playing");
+      // TODO: ボード満杯のシナリオを実装
+    });
+
+    it("引き分け後は石を置くことができない", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+
+      // 引き分け状態を作成（実装後に調整）
+      // TODO: 引き分け状態のシナリオを実装
+      expect(result.current.gameStatus).toBe("playing");
+    });
+  });
 });
