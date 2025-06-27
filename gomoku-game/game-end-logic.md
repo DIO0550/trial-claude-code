@@ -11,8 +11,9 @@
 
 ### 1. 勝利判定ユーティリティ関数
 - **ファイル**: `src/features/board/utils/board.ts`に追加
-- **関数**: `checkWinner(board: Board, lastMove: Position): StoneColor | null`
-- **機能**: 最後に置かれた石の位置から4方向（縦・横・斜め）で5つ連続をチェック
+- **関数**: `countConsecutiveStones(board: Board, position: Position): number`（既に実装済み）
+- **機能**: 最後に置かれた石の位置から4方向（縦・横・斜め）で連続する石の数をカウント
+- **勝利判定**: 5つ以上連続していれば勝利
 
 ### 2. 勝利判定ロジックの統合
 - **ファイル**: `src/features/game/hooks/useGomokuGame.ts`を修正
@@ -29,7 +30,7 @@
    - 横、縦、斜め方向の勝利パターンをテスト
    - 勝利しない場合のテスト
 
-2. **`Board.checkWinner`関数実装**
+2. **`Board.countConsecutiveStones`関数実装**（既に実装済み）
    - 4方向の連続チェックロジック
    - 最適化されたアルゴリズム
 
@@ -61,8 +62,8 @@ const directions = [
   [1, -1]   // 斜め（右上方向）
 ];
 
-// 勝利条件
-const WIN_LENGTH = 5;
+// 勝利条件（定数として定義済み）
+import { WIN_LENGTH } from "@/features/board/constants/dimensions";
 ```
 
 ### チェック方法
@@ -78,15 +79,15 @@ const WIN_LENGTH = 5;
 
 ## 実装例
 
-### Board.checkWinner関数の署名
+### Board.countConsecutiveStones関数の署名（既に実装済み）
 ```typescript
 /**
- * 勝利判定を行う
+ * 指定位置から連続する同色の石の数を数える
  * @param board ゲームボード
- * @param lastMove 最後に置かれた石の位置
- * @returns 勝利した色、または勝利者がいない場合はnull
+ * @param position 基準となる位置
+ * @returns その位置を含む最大連続数
  */
-checkWinner: (board: Board, lastMove: Position) => StoneColor | null
+countConsecutiveStones: (board: Board, position: Position) => number
 ```
 
 ### useGomokuGameの修正箇所
@@ -95,8 +96,9 @@ const makeMove = useCallback((row: number, col: number): void => {
   // 既存の石配置処理
   
   // 勝利判定の追加
-  const winner = Board.checkWinner(board, { row, col });
-  if (winner) {
+  const consecutiveCount = Board.countConsecutiveStones(board, { row, col });
+  if (consecutiveCount >= WIN_LENGTH) {
+    const winner = board[row][col];
     dispatch({ type: "SET_WINNER", winner });
     return;
   }
