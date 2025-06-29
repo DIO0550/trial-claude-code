@@ -45,6 +45,8 @@ const ColorSelector = ({
       options={colorOptions}
       selectedValue={selectedColor}
       onValueChange={onColorChange}
+      layout="grid"
+      gridColumns={3}
     />
   );
 };

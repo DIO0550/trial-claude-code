@@ -22,6 +22,8 @@ const CpuLevelSelector = ({ selectedCpuLevel, onCpuLevelChange }: Props): JSX.El
       options={cpuLevelOptions}
       selectedValue={selectedCpuLevel}
       onValueChange={onCpuLevelChange}
+      layout="grid"
+      gridColumns={3}
     />
   );
 };
