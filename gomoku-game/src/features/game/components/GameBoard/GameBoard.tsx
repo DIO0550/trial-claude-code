@@ -4,6 +4,8 @@ import Stone from "@/components/Stone/Stone";
 import Button from "@/components/elements/Button/Button";
 import TurnIndicator from "@/features/game/components/TurnIndicator/TurnIndicator";
 import Board from "@/features/board/components/Board/Board";
+import { GameResultModal } from "@/features/game/components/GameResultModal/GameResultModal";
+import { useGomokuGame, GameSettings } from "@/features/game/hooks/useGomokuGame";
 import { StoneColor } from "@/features/board/utils/stone";
 import { CpuLevel } from "@/features/cpu/utils/cpuLevel";
 import { JSX } from "react";
@@ -16,19 +18,32 @@ interface Props {
 
 /**
  * 五目並べゲーム画面全体のコンポーネント
- * ヘッダー、ゲームボード、ターン表示を含む
+ * ヘッダー、ゲームボード、ターン表示、ゲーム結果モーダルを含む
  * @param cpuLevel - CPUの難易度レベル
  * @param playerColor - プレイヤーの石の色
  * @param onBackToStart - スタート画面に戻るコールバック関数
  * @returns ゲーム画面全体のレイアウト
  */
 const GameBoard = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Element => {
+  const gameSettings: GameSettings = { playerColor, cpuLevel };
+  const { board, gameStatus, winner, canMakeMove, makeMove, resetGame } = useGomokuGame(gameSettings);
+  
   const cpuLevelLabels = {
     beginner: "入門",
     easy: "やさしい", 
     normal: "ふつう",
     hard: "むずかしい",
     expert: "エキスパート"
+  };
+
+  const isGameFinished = gameStatus === "won" || gameStatus === "draw";
+
+  const handleRestart = () => {
+    resetGame();
+  };
+
+  const handleBackToMenu = () => {
+    onBackToStart();
   };
 
   return (
@@ -63,11 +78,19 @@ const GameBoard = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Element
             <p className="text-lg text-gray-700">ゲームボード（15×15）</p>
           </div>
           
-          <Board playerColor={playerColor} />
+          <Board board={board} canMakeMove={canMakeMove} onMakeMove={makeMove} />
 
           <TurnIndicator playerColor={playerColor} />
         </div>
       </div>
+
+      <GameResultModal
+        isOpen={isGameFinished}
+        winner={winner}
+        playerColor={playerColor}
+        onRestart={handleRestart}
+        onBackToMenu={handleBackToMenu}
+      />
     </div>
   );
 };

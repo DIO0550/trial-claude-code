@@ -96,6 +96,12 @@ export const CpuLevelExample: Story = {
 };
 
 export const Interactive: Story = {
+  args: {
+    title: "インタラクティブ例",
+    options: [],
+    selectedValue: "",
+    onValueChange: () => {},
+  },
   render: () => {
     const InteractiveExample = () => {
       const [selectedValue, setSelectedValue] = useState("medium");

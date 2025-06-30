@@ -1,25 +1,23 @@
 import Stone from "@/components/Stone/Stone";
-import { useGomokuGame, GameSettings } from "@/features/game/hooks/useGomokuGame";
 import { BOARD_SIZE } from "@/features/board/constants/dimensions";
-import { StoneColor } from "@/features/board/utils/stone";
-import { CpuLevel } from "@/features/cpu/utils/cpuLevel";
+import { Board as BoardData } from "@/features/board/utils/board";
 import { JSX } from "react";
 
 interface Props {
-  playerColor: StoneColor;
-  cpuLevel?: CpuLevel;
+  board: BoardData;
+  canMakeMove: (row: number, col: number) => boolean;
+  onMakeMove: (row: number, col: number) => void;
 }
 
 /**
  * 15×15の五目並べゲームボードコンポーネント
  * プレイヤーが石を配置できるインタラクティブなボード
- * @param playerColor - プレイヤーの石の色
- * @param cpuLevel - CPUの難易度レベル
+ * @param board - ゲームボードの状態データ
+ * @param canMakeMove - 指定位置に石を配置可能かを判定する関数
+ * @param onMakeMove - 石を配置する際のコールバック関数
  * @returns 五目並べのゲームボード
  */
-const Board = ({ playerColor, cpuLevel = "easy" }: Props): JSX.Element => {
-  const gameSettings: GameSettings = { playerColor, cpuLevel };
-  const { board, canMakeMove, makeMove } = useGomokuGame(gameSettings);
+const Board = ({ board, canMakeMove, onMakeMove }: Props): JSX.Element => {
 
   /**
    * セルクリック時の処理
@@ -27,7 +25,7 @@ const Board = ({ playerColor, cpuLevel = "easy" }: Props): JSX.Element => {
    */
   const handleCellClick = (row: number, col: number) => {
     if (canMakeMove(row, col)) {
-      makeMove(row, col);
+      onMakeMove(row, col);
     }
   };
 
