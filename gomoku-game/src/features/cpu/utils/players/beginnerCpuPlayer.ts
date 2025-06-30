@@ -98,7 +98,8 @@ const getAvailablePositions = (board: Board): Position[] => {
 export const createBeginnerCpuPlayer = (color: StoneColor): CpuPlayer => ({
   cpuLevel: "beginner",
   color,
-  calculateNextMove: (board: Board, moveHistory: Position[]): Position | null => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  calculateNextMove: (board: Board, _moveHistory: Position[]): Position | null => {
     const availablePositions = getAvailablePositions(board);
     
     if (availablePositions.length === 0) {

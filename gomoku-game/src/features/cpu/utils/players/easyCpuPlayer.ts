@@ -235,7 +235,8 @@ const getProximityMoves = (board: Board, targetPositions: Position[]): Position[
 export const createEasyCpuPlayer = (color: StoneColor): CpuPlayer => ({
   cpuLevel: "easy",
   color,
-  calculateNextMove: (board: Board, moveHistory: Position[]): Position | null => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  calculateNextMove: (board: Board, _moveHistory: Position[]): Position | null => {
     const availablePositions = getAvailablePositions(board);
     
     if (availablePositions.length === 0) {
