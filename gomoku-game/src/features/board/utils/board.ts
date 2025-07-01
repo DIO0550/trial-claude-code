@@ -78,6 +78,40 @@ export const Board = {
   },
 
   /**
+   * 指定した位置から指定方向に連続した石の数を数える
+   * @param board - ゲームボード
+   * @param row - 開始行
+   * @param col - 開始列
+   * @param deltaRow - 行方向の移動量
+   * @param deltaCol - 列方向の移動量
+   * @param color - 対象の石の色
+   * @returns 連続した石の数
+   */
+  countConsecutiveStonesInDirection: (
+    board: Board,
+    row: number,
+    col: number,
+    deltaRow: number,
+    deltaCol: number,
+    color: StoneColor
+  ): number => {
+    let count = 0;
+    let currentRow = row;
+    let currentCol = col;
+    
+    while (
+      Board.isValidPosition(currentRow, currentCol) &&
+      board[currentRow][currentCol] === color
+    ) {
+      count++;
+      currentRow += deltaRow;
+      currentCol += deltaCol;
+    }
+    
+    return count;
+  },
+
+  /**
    * 指定位置から連続する同色の石の数を数える
    * @param board ゲームボード
    * @param position 基準となる位置
@@ -104,32 +138,10 @@ export const Board = {
     
     // 各方向について連続する石の数をカウント
     for (const [dr, dc] of directions) {
-      let count = 1; // 現在の石を含む
-      
-      // 正方向に検索
-      for (let i = 1; i < BOARD_SIZE; i++) {
-        const newRow = row + dr * i;
-        const newCol = col + dc * i;
-        
-        if (!Board.isValidPosition(newRow, newCol) || board[newRow][newCol] !== stoneColor) {
-          break;
-        }
-        count++;
-      }
-      
-      // 逆方向に検索
-      for (let i = 1; i < BOARD_SIZE; i++) {
-        const newRow = row - dr * i;
-        const newCol = col - dc * i;
-        
-        if (!Board.isValidPosition(newRow, newCol) || board[newRow][newCol] !== stoneColor) {
-          break;
-        }
-        count++;
-      }
-      
-      // 最大値を更新
-      maxCount = Math.max(maxCount, count);
+      const forwardCount = Board.countConsecutiveStonesInDirection(board, row + dr, col + dc, dr, dc, stoneColor);
+      const backwardCount = Board.countConsecutiveStonesInDirection(board, row - dr, col - dc, -dr, -dc, stoneColor);
+      const totalCount = forwardCount + backwardCount + 1; // 現在の石を含む
+      maxCount = Math.max(maxCount, totalCount);
     }
     
     return maxCount;
