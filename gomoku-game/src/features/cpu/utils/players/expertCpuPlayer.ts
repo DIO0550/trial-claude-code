@@ -3,6 +3,9 @@ import { StoneColor } from "@/features/board/utils/stone";
 import { Board } from "@/features/board/utils/board";
 import { Position } from "@/features/board/utils/position";
 import { BOARD_SIZE } from "@/features/board/constants/dimensions";
+import { countBidirectionalStones, calculateConsecutiveCounts } from "@/features/cpu/utils/analysis/boardAnalysis";
+import { isPatternOpen } from "@/features/cpu/utils/analysis/patternEvaluation";
+import { getOpeningMove } from "@/features/cpu/utils/analysis/gameStrategy";
 
 // 方向定数
 const DIRECTIONS = [
@@ -129,121 +132,7 @@ const getOpponentColor = (color: StoneColor): StoneColor => {
   }
 };
 
-/**
- * 指定した位置から指定方向に連続した石の数を数える
- */
-const countConsecutiveStones = (
-  board: Board,
-  row: number,
-  col: number,
-  deltaRow: number,
-  deltaCol: number,
-  color: StoneColor
-): number => {
-  let count = 0;
-  let currentRow = row;
-  let currentCol = col;
-  
-  while (
-    Board.isValidPosition(currentRow, currentCol) &&
-    board[currentRow][currentCol] === color
-  ) {
-    count++;
-    currentRow += deltaRow;
-    currentCol += deltaCol;
-  }
-  
-  return count;
-};
 
-/**
- * 指定した位置から双方向に連続した石の数を数える（中心を含む）
- */
-const countBidirectionalStones = (
-  board: Board,
-  row: number,
-  col: number,
-  deltaRow: number,
-  deltaCol: number,
-  color: StoneColor
-): number => {
-  const forwardCount = countConsecutiveStones(
-    board, row + deltaRow, col + deltaCol, deltaRow, deltaCol, color
-  );
-  
-  const backwardCount = countConsecutiveStones(
-    board, row - deltaRow, col - deltaCol, -deltaRow, -deltaCol, color
-  );
-  
-  return forwardCount + backwardCount + 1;
-};
-
-/**
- * パターンが開放されているかチェックする（両端が空いているか）
- */
-const isPatternOpen = (
-  board: Board,
-  row: number,
-  col: number,
-  deltaRow: number,
-  deltaCol: number
-): boolean => {
-  const forwardCount = countConsecutiveStones(
-    board, row + deltaRow, col + deltaCol, deltaRow, deltaCol, 
-    board[row][col]
-  );
-  
-  const backwardCount = countConsecutiveStones(
-    board, row - deltaRow, col - deltaCol, -deltaRow, -deltaCol, 
-    board[row][col]
-  );
-  
-  // 前方の開放チェック
-  const forwardEnd = {
-    row: row + deltaRow * (forwardCount + 1),
-    col: col + deltaCol * (forwardCount + 1)
-  };
-  
-  const forwardOpen = (
-    Board.isValidPosition(forwardEnd.row, forwardEnd.col) &&
-    StoneColor.isNone(board[forwardEnd.row][forwardEnd.col])
-  );
-  
-  // 後方の開放チェック
-  const backwardEnd = {
-    row: row - deltaRow * (backwardCount + 1),
-    col: col - deltaCol * (backwardCount + 1)
-  };
-  
-  const backwardOpen = (
-    Board.isValidPosition(backwardEnd.row, backwardEnd.col) &&
-    StoneColor.isNone(board[backwardEnd.row][backwardEnd.col])
-  );
-  
-  return forwardOpen && backwardOpen;
-};
-
-/**
- * 指定位置に石を置いた場合の連続数を各方向で計算する
- */
-const calculateConsecutiveCounts = (
-  board: Board,
-  position: Position,
-  color: StoneColor
-): number[] => {
-  const tempBoard = Board.placeStone(board, position.row, position.col, color);
-  
-  return DIRECTIONS.map(direction => 
-    countBidirectionalStones(
-      tempBoard, 
-      position.row, 
-      position.col, 
-      direction.deltaRow, 
-      direction.deltaCol, 
-      color
-    )
-  );
-};
 
 /**
  * 複雑なパターン分析（間隔攻撃、複数方向脅威等）
@@ -750,49 +639,6 @@ const findCriticalMove = (
   return null;
 };
 
-/**
- * 序盤の定石配置を取得する（Expert版：初手完璧配置）
- */
-const getOpeningMove = (
-  board: Board,
-  moveHistory: Position[],
-  gamePhase: GamePhase
-): Position | null => {
-  if (gamePhase !== 'early') {
-    return null;
-  }
-  
-  // 初手時：中央付近完璧配置（7±2の範囲）
-  if (Board.isEmpty(board)) {
-    const centerPosition = Board.getCenterPosition();
-    const centerNearbyPositions = Board.getNearbyPositions(centerPosition, 2);
-    
-    // Expert版では中央に最も近い位置（中央そのもの）を優先
-    for (const position of centerNearbyPositions) {
-      if (StoneColor.isNone(board[position.row][position.col])) {
-        return position; // 中央から距離0（中央そのもの）が最初に返される
-      }
-    }
-  }
-  
-  // 2手目以降は戦略的要所
-  const center = Math.floor(BOARD_SIZE / 2);
-  for (const offset of STRATEGIC_POSITIONS) {
-    const position = { 
-      row: center + offset.row, 
-      col: center + offset.col 
-    };
-    
-    if (
-      Board.isValidPosition(position.row, position.col) &&
-      StoneColor.isNone(board[position.row][position.col])
-    ) {
-      return position;
-    }
-  }
-  
-  return null;
-};
 
 /**
  * 候補手をスコア順にソートする（Expert版）
