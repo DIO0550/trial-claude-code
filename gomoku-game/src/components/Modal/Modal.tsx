@@ -10,7 +10,7 @@ type Props = {
  * 汎用モーダルダイアログコンポーネント
  * オーバーレイ、フォーカス管理、ESCキー対応を提供する
  */
-export const Modal = ({ isOpen, onClose, children }: Props): JSX.Element => {
+export const Modal = ({ isOpen, onClose, children }: Props): React.JSX.Element => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export const Modal = ({ isOpen, onClose, children }: Props): JSX.Element => {
   return (
     <div
       data-testid="modal-overlay"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75"
       onClick={handleOverlayClick}
     >
       <div
