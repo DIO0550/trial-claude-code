@@ -1,7 +1,7 @@
 import { useCallback, useReducer, useEffect } from "react";
 import { useCpuPlayer } from "@/features/cpu/hooks/useCpuPlayer";
 import { StoneColor } from "@/features/board/utils/stone";
-import { Board } from "@/features/board/utils/board";
+import { Board, WinningLine } from "@/features/board/utils/board";
 import { GameBoard } from "@/features/board/utils/gameBoard";
 import { Position } from "@/features/board/utils/position";
 import { CpuLevel } from "@/features/cpu/utils/cpuLevel";
@@ -25,6 +25,8 @@ export interface UseGomokuGameReturn {
   makeMove: (row: number, col: number) => void;
   resetGame: () => void;
   canMakeMove: (row: number, col: number) => boolean;
+  winningLine: WinningLine | null;
+  showResultModal: boolean;
 }
 
 interface GameState {
@@ -33,13 +35,16 @@ interface GameState {
   gameStatus: GameStatus;
   winner: StoneColor | null;
   moveHistory: Position[];
+  winningLine: WinningLine | null;
+  showResultModal: boolean;
 }
 
 type GameAction =
   | { type: "MAKE_MOVE"; position: Position }
   | { type: "SET_WINNER"; winner: StoneColor }
   | { type: "SET_DRAW" }
-  | { type: "RESET_GAME" };
+  | { type: "RESET_GAME" }
+  | { type: "SHOW_RESULT_MODAL" };
 
 const gameReducer = (state: GameState, action: GameAction): GameState => {
   switch (action.type) {
@@ -56,11 +61,14 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
       const consecutiveCount = Board.countConsecutiveStones(newGameBoard.board, position);
       if (consecutiveCount >= WIN_LENGTH) {
         const winner = newGameBoard.board[position.row][position.col];
+        const winningLine = Board.findWinningLine(newGameBoard.board, position);
         return {
           ...state,
           gameBoard: newGameBoard,
           gameStatus: "won",
           winner,
+          winningLine,
+          showResultModal: false, // 初期状態では非表示
           moveHistory: [...state.moveHistory, position],
         };
       }
@@ -71,6 +79,7 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
           ...state,
           gameBoard: newGameBoard,
           gameStatus: "draw",
+          showResultModal: false, // 初期状態では非表示
           moveHistory: [...state.moveHistory, position],
         };
       }
@@ -94,6 +103,11 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
         ...state,
         gameStatus: "draw",
       };
+    case "SHOW_RESULT_MODAL":
+      return {
+        ...state,
+        showResultModal: true,
+      };
     case "RESET_GAME":
       return {
         gameBoard: GameBoard.createEmpty(),
@@ -101,6 +115,8 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
         gameStatus: "playing",
         winner: null,
         moveHistory: [],
+        winningLine: null,
+        showResultModal: false,
       };
     default:
       return state;
@@ -123,6 +139,8 @@ export const useGomokuGame = (settings: GameSettings): UseGomokuGameReturn => {
     gameStatus: "playing",
     winner: null,
     moveHistory: [],
+    winningLine: null,
+    showResultModal: false,
   });
 
   const isPlayerTurn = gameState.currentPlayer === settings.playerColor;
@@ -164,6 +182,20 @@ export const useGomokuGame = (settings: GameSettings): UseGomokuGameReturn => {
     makeMove,
   ]);
 
+  // 勝利時の遅延表示機能
+  useEffect(() => {
+    if (
+      (gameState.gameStatus === "won" || gameState.gameStatus === "draw") &&
+      !gameState.showResultModal
+    ) {
+      const timer = setTimeout(() => {
+        dispatch({ type: "SHOW_RESULT_MODAL" });
+      }, 2000); // 2秒遅延
+
+      return () => clearTimeout(timer);
+    }
+  }, [gameState.gameStatus, gameState.showResultModal]);
+
   const resetGame = useCallback(() => {
     dispatch({ type: "RESET_GAME" });
   }, []);
@@ -187,5 +219,7 @@ export const useGomokuGame = (settings: GameSettings): UseGomokuGameReturn => {
     makeMove,
     resetGame,
     canMakeMove,
+    winningLine: gameState.winningLine,
+    showResultModal: gameState.showResultModal,
   };
 };

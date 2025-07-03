@@ -39,6 +39,18 @@ describe("useGomokuGame", () => {
 
       expect(result.current.moveHistory).toEqual([]);
     });
+
+    it("初期状態で勝利ラインがnullである", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+
+      expect(result.current.winningLine).toBeNull();
+    });
+
+    it("初期状態で結果モーダルが非表示である", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+
+      expect(result.current.showResultModal).toBe(false);
+    });
   });
 
   describe("プレイヤーターンの管理", () => {
@@ -147,6 +159,8 @@ describe("useGomokuGame", () => {
       expect(result.current.gameStatus).toBe("playing");
       expect(result.current.winner).toBeNull();
       expect(result.current.moveHistory).toEqual([]);
+      expect(result.current.winningLine).toBeNull();
+      expect(result.current.showResultModal).toBe(false);
     });
   });
 
@@ -185,6 +199,47 @@ describe("useGomokuGame", () => {
 
       expect(result.current.gameStatus).toBe("won");
       expect(result.current.winner).toBe("black");
+    });
+
+    it("勝利時に勝利ラインが設定される", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+
+      // 黒石を横に5つ並べる
+      act(() => {
+        result.current.makeMove(7, 7); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 7); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 8); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 8); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 9); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 9); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 10); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 10); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 11); // 黒 - 5つ目
+      });
+
+      expect(result.current.winningLine).not.toBeNull();
+      expect(result.current.winningLine?.positions).toHaveLength(5);
+      expect(result.current.winningLine?.positions).toContainEqual({ row: 7, col: 7 });
+      expect(result.current.winningLine?.positions).toContainEqual({ row: 7, col: 8 });
+      expect(result.current.winningLine?.positions).toContainEqual({ row: 7, col: 9 });
+      expect(result.current.winningLine?.positions).toContainEqual({ row: 7, col: 10 });
+      expect(result.current.winningLine?.positions).toContainEqual({ row: 7, col: 11 });
     });
 
     it("縦方向に5つ連続で並んだ場合に勝利する", () => {
@@ -335,6 +390,44 @@ describe("useGomokuGame", () => {
 
       expect(result.current.gameStatus).toBe("won");
       expect(result.current.canMakeMove(0, 0)).toBe(false);
+    });
+  });
+
+  describe("遅延表示機能", () => {
+    it("勝利直後は結果モーダルが非表示である", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+
+      // 黒石を横に5つ並べて勝利させる
+      act(() => {
+        result.current.makeMove(7, 7); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 7); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 8); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 8); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 9); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 9); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 10); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 10); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 11); // 黒 - 5つ目
+      });
+
+      expect(result.current.gameStatus).toBe("won");
+      expect(result.current.showResultModal).toBe(false);
     });
   });
 
