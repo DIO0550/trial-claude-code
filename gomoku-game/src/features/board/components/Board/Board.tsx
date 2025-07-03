@@ -1,12 +1,13 @@
 import Stone from "@/components/Stone/Stone";
 import { BOARD_SIZE } from "@/features/board/constants/dimensions";
-import { Board as BoardData } from "@/features/board/utils/board";
+import { Board as BoardData, WinningLine } from "@/features/board/utils/board";
 import { JSX } from "react";
 
 interface Props {
   board: BoardData;
   canMakeMove: (row: number, col: number) => boolean;
   onMakeMove: (row: number, col: number) => void;
+  winningLine?: WinningLine | null;
 }
 
 /**
@@ -17,7 +18,15 @@ interface Props {
  * @param onMakeMove - 石を配置する際のコールバック関数
  * @returns 五目並べのゲームボード
  */
-const Board = ({ board, canMakeMove, onMakeMove }: Props): JSX.Element => {
+const Board = ({ board, canMakeMove, onMakeMove, winningLine }: Props): JSX.Element => {
+
+  /**
+   * 指定位置が勝利ラインに含まれるかチェック
+   */
+  const isWinningPosition = (row: number, col: number): boolean => {
+    if (!winningLine) return false;
+    return winningLine.positions.some(pos => pos.row === row && pos.col === col);
+  };
 
   /**
    * セルクリック時の処理
@@ -43,6 +52,7 @@ const Board = ({ board, canMakeMove, onMakeMove }: Props): JSX.Element => {
             Array.from({ length: BOARD_SIZE }).map((_, col) => {
               const stone = board[row][col];
               const isClickable = canMakeMove(row, col);
+              const isWinning = isWinningPosition(row, col);
               
               return (
                 <button
@@ -51,6 +61,7 @@ const Board = ({ board, canMakeMove, onMakeMove }: Props): JSX.Element => {
                     w-8 h-8 border border-amber-700 bg-amber-100 flex items-center justify-center
                     relative
                     ${isClickable ? 'hover:bg-amber-200 cursor-pointer' : 'cursor-default'}
+                    ${isWinning ? 'bg-red-300 border-red-600 shadow-lg' : ''}
                     ${row === 0 ? 'border-t-2 border-t-amber-800' : ''}
                     ${row === BOARD_SIZE - 1 ? 'border-b-2 border-b-amber-800' : ''}
                     ${col === 0 ? 'border-l-2 border-l-amber-800' : ''}
@@ -58,6 +69,7 @@ const Board = ({ board, canMakeMove, onMakeMove }: Props): JSX.Element => {
                   `}
                   onClick={() => handleCellClick(row, col)}
                   disabled={!isClickable}
+                  data-testid={isWinning ? `winning-cell-${row}-${col}` : `cell-${row}-${col}`}
                 >
                   {stone !== "none" && (
                     <div className="w-6 h-6">

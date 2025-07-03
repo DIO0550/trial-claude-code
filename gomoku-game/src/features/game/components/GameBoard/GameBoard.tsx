@@ -26,7 +26,7 @@ interface Props {
  */
 const GameBoard = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Element => {
   const gameSettings: GameSettings = { playerColor, cpuLevel };
-  const { board, gameStatus, winner, canMakeMove, makeMove, resetGame } = useGomokuGame(gameSettings);
+  const { board, winner, canMakeMove, makeMove, resetGame, winningLine, showResultModal } = useGomokuGame(gameSettings);
   
   const cpuLevelLabels = {
     beginner: "入門",
@@ -36,7 +36,7 @@ const GameBoard = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Element
     expert: "エキスパート"
   };
 
-  const isGameFinished = gameStatus === "won" || gameStatus === "draw";
+  // showResultModalフラグを使用してモーダル表示を制御
 
   const handleRestart = () => {
     resetGame();
@@ -78,14 +78,14 @@ const GameBoard = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Element
             <p className="text-lg text-gray-700">ゲームボード（15×15）</p>
           </div>
           
-          <Board board={board} canMakeMove={canMakeMove} onMakeMove={makeMove} />
+          <Board board={board} canMakeMove={canMakeMove} onMakeMove={makeMove} winningLine={winningLine} />
 
           <TurnIndicator playerColor={playerColor} />
         </div>
       </div>
 
       <GameResultModal
-        isOpen={isGameFinished}
+        isOpen={showResultModal}
         winner={winner}
         playerColor={playerColor}
         onRestart={handleRestart}
