@@ -407,4 +407,132 @@ describe("Board", () => {
       });
     });
   });
+
+  describe("findWinningLine", () => {
+    describe("横方向の勝利", () => {
+      it("横に5つ連続で勝利した場合、その5つの位置を返す", () => {
+        const board = Board.createEmpty();
+        
+        // 横に5つ黒石を配置 (7,3) から (7,7)
+        for (let col = 3; col <= 7; col++) {
+          board[7][col] = "black";
+        }
+        
+        const result = Board.findWinningLine(board, { row: 7, col: 7 });
+        expect(result).not.toBeNull();
+        expect(result?.positions).toHaveLength(5);
+        expect(result?.positions).toContainEqual({ row: 7, col: 3 });
+        expect(result?.positions).toContainEqual({ row: 7, col: 4 });
+        expect(result?.positions).toContainEqual({ row: 7, col: 5 });
+        expect(result?.positions).toContainEqual({ row: 7, col: 6 });
+        expect(result?.positions).toContainEqual({ row: 7, col: 7 });
+      });
+
+      it("横に6つ連続で勝利した場合でも5つの位置を返す", () => {
+        const board = Board.createEmpty();
+        
+        // 横に6つ黒石を配置 (7,2) から (7,7)
+        for (let col = 2; col <= 7; col++) {
+          board[7][col] = "black";
+        }
+        
+        const result = Board.findWinningLine(board, { row: 7, col: 5 });
+        expect(result).not.toBeNull();
+        expect(result?.positions).toHaveLength(5);
+      });
+    });
+
+    describe("縦方向の勝利", () => {
+      it("縦に5つ連続で勝利した場合、その5つの位置を返す", () => {
+        const board = Board.createEmpty();
+        
+        // 縦に5つ白石を配置 (3,7) から (7,7)
+        for (let row = 3; row <= 7; row++) {
+          board[row][7] = "white";
+        }
+        
+        const result = Board.findWinningLine(board, { row: 5, col: 7 });
+        expect(result).not.toBeNull();
+        expect(result?.positions).toHaveLength(5);
+        expect(result?.positions).toContainEqual({ row: 3, col: 7 });
+        expect(result?.positions).toContainEqual({ row: 4, col: 7 });
+        expect(result?.positions).toContainEqual({ row: 5, col: 7 });
+        expect(result?.positions).toContainEqual({ row: 6, col: 7 });
+        expect(result?.positions).toContainEqual({ row: 7, col: 7 });
+      });
+    });
+
+    describe("斜め方向の勝利", () => {
+      it("右下方向に5つ連続で勝利した場合、その5つの位置を返す", () => {
+        const board = Board.createEmpty();
+        
+        // 右下斜めに5つ黒石を配置 (3,3) から (7,7)
+        for (let i = 0; i < 5; i++) {
+          board[3 + i][3 + i] = "black";
+        }
+        
+        const result = Board.findWinningLine(board, { row: 7, col: 7 });
+        expect(result).not.toBeNull();
+        expect(result?.positions).toHaveLength(5);
+        expect(result?.positions).toContainEqual({ row: 3, col: 3 });
+        expect(result?.positions).toContainEqual({ row: 4, col: 4 });
+        expect(result?.positions).toContainEqual({ row: 5, col: 5 });
+        expect(result?.positions).toContainEqual({ row: 6, col: 6 });
+        expect(result?.positions).toContainEqual({ row: 7, col: 7 });
+      });
+
+      it("右上方向に5つ連続で勝利した場合、その5つの位置を返す", () => {
+        const board = Board.createEmpty();
+        
+        // 右上斜めに5つ白石を配置 (9,3) から (5,7)
+        for (let i = 0; i < 5; i++) {
+          board[9 - i][3 + i] = "white";
+        }
+        
+        const result = Board.findWinningLine(board, { row: 7, col: 5 });
+        expect(result).not.toBeNull();
+        expect(result?.positions).toHaveLength(5);
+        expect(result?.positions).toContainEqual({ row: 9, col: 3 });
+        expect(result?.positions).toContainEqual({ row: 8, col: 4 });
+        expect(result?.positions).toContainEqual({ row: 7, col: 5 });
+        expect(result?.positions).toContainEqual({ row: 6, col: 6 });
+        expect(result?.positions).toContainEqual({ row: 5, col: 7 });
+      });
+    });
+
+    describe("勝利していないケース", () => {
+      it("4つ連続の場合はnullを返す", () => {
+        const board = Board.createEmpty();
+        
+        // 横に4つ黒石を配置
+        for (let col = 3; col <= 6; col++) {
+          board[7][col] = "black";
+        }
+        
+        const result = Board.findWinningLine(board, { row: 7, col: 6 });
+        expect(result).toBeNull();
+      });
+
+      it("間に異なる色が挟まっている場合はnullを返す", () => {
+        const board = Board.createEmpty();
+        
+        // 黒-黒-白-黒-黒の配置
+        board[7][3] = "black";
+        board[7][4] = "black";
+        board[7][5] = "white";
+        board[7][6] = "black";
+        board[7][7] = "black";
+        
+        const result = Board.findWinningLine(board, { row: 7, col: 7 });
+        expect(result).toBeNull();
+      });
+
+      it("空のマスではnullを返す", () => {
+        const board = Board.createEmpty();
+        
+        const result = Board.findWinningLine(board, { row: 7, col: 7 });
+        expect(result).toBeNull();
+      });
+    });
+  });
 });
