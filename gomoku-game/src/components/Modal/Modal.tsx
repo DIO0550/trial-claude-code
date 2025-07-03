@@ -49,7 +49,7 @@ export const Modal = ({ isOpen, onClose, children }: Props): React.JSX.Element =
   return (
     <div
       data-testid="modal-overlay"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
       onClick={handleOverlayClick}
     >
       <div
