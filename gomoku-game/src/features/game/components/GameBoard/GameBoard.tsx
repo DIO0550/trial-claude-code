@@ -4,7 +4,7 @@ import Stone from "@/components/Stone/Stone";
 import Button from "@/components/elements/Button/Button";
 import TurnIndicator from "@/features/game/components/TurnIndicator/TurnIndicator";
 import Board from "@/features/board/components/Board/Board";
-import { GameResultModal } from "@/features/game/components/GameResultModal/GameResultModal";
+import { GameResult } from "@/features/game/components/GameResult/GameResult";
 import { useGomokuGame, GameSettings } from "@/features/game/hooks/useGomokuGame";
 import { StoneColor } from "@/features/board/utils/stone";
 import { CpuLevel } from "@/features/cpu/utils/cpuLevel";
@@ -73,6 +73,19 @@ const GameBoard = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Element
           <div className="w-32"></div>
         </div>
 
+        {/* ゲーム結果パネル */}
+        {showResultModal && (
+          <div className="mb-6">
+            <GameResult
+              showResult={showResultModal}
+              winner={winner}
+              playerColor={playerColor}
+              onRestart={handleRestart}
+              onBackToMenu={handleBackToMenu}
+            />
+          </div>
+        )}
+
         <div className="bg-white rounded-lg shadow-lg p-6">
           <div className="text-center mb-4">
             <p className="text-lg text-gray-700">ゲームボード（15×15）</p>
@@ -83,14 +96,6 @@ const GameBoard = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Element
           <TurnIndicator playerColor={playerColor} />
         </div>
       </div>
-
-      <GameResultModal
-        isOpen={showResultModal}
-        winner={winner}
-        playerColor={playerColor}
-        onRestart={handleRestart}
-        onBackToMenu={handleBackToMenu}
-      />
     </div>
   );
 };

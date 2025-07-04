@@ -33,7 +33,7 @@ describe("Button", () => {
     it("secondaryバリアントが正しく適用される", () => {
       render(<Button variant="secondary">セカンダリ</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-gray-500", "text-white");
+      expect(button).toHaveClass("bg-gray-200", "text-gray-800");
     });
   });
 
