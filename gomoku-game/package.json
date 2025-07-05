@@ -10,6 +10,7 @@
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
+    "test:integration": "vitest run --reporter=verbose src/features/cpu/utils/players/expertCpuPlayer.integration.test.ts",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
