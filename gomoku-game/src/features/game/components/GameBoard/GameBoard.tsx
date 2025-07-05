@@ -1,10 +1,9 @@
 "use client";
 
-import Stone from "@/components/Stone/Stone";
 import Button from "@/components/elements/Button/Button";
-import TurnIndicator from "@/features/game/components/TurnIndicator/TurnIndicator";
 import Board from "@/features/board/components/Board/Board";
 import { GameResult } from "@/features/game/components/GameResult/GameResult";
+import { PlayerIndicator } from "@/features/game/components/PlayerIndicator/PlayerIndicator";
 import { useGomokuGame, GameSettings } from "@/features/game/hooks/useGomokuGame";
 import { StoneColor } from "@/features/board/utils/stone";
 import { CpuLevel } from "@/features/cpu/utils/cpuLevel";
@@ -26,7 +25,7 @@ interface Props {
  */
 const GameBoard = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Element => {
   const gameSettings: GameSettings = { playerColor, cpuLevel };
-  const { board, winner, canMakeMove, makeMove, resetGame, winningLine, showResultModal } = useGomokuGame(gameSettings);
+  const { board, winner, canMakeMove, makeMove, resetGame, winningLine, showResultModal, currentPlayer } = useGomokuGame(gameSettings);
   
   const cpuLevelLabels = {
     beginner: "入門",
@@ -46,8 +45,10 @@ const GameBoard = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Element
     onBackToStart();
   };
 
+  const cpuColor: StoneColor = playerColor === "black" ? "white" : "black";
+
   return (
-    <div className="min-h-screen flex flex-col items-center p-4 bg-gray-50">
+    <div className="flex flex-col items-center p-4 bg-gray-50">
       <div className="w-full max-w-4xl">
         <div className="flex justify-between items-center mb-6">
           <Button
@@ -62,11 +63,6 @@ const GameBoard = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Element
             <h1 className="text-2xl font-bold text-gray-800 mb-2">五目並べ</h1>
             <div className="flex items-center justify-center space-x-4 text-sm text-gray-600">
               <span>CPUレベル: {cpuLevelLabels[cpuLevel]}</span>
-              <span>|</span>
-              <div className="flex items-center space-x-1">
-                <span>あなた:</span>
-                <Stone color={playerColor} />
-              </div>
             </div>
           </div>
           
@@ -86,14 +82,35 @@ const GameBoard = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Element
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-white rounded-lg shadow-lg p-6 relative">
           <div className="text-center mb-4">
             <p className="text-lg text-gray-700">ゲームボード（15×15）</p>
           </div>
           
-          <Board board={board} canMakeMove={canMakeMove} onMakeMove={makeMove} winningLine={winningLine} />
+          <div className="flex items-center justify-center gap-8">
+            {/* プレイヤー石表示（盤面左側） */}
+            <div className="flex items-end h-96">
+              <PlayerIndicator 
+                color={playerColor} 
+                label="あなた" 
+                isCurrentTurn={currentPlayer === playerColor}
+              />
+            </div>
 
-          <TurnIndicator playerColor={playerColor} />
+            {/* ゲームボード */}
+            <div className="relative">
+              <Board board={board} canMakeMove={canMakeMove} onMakeMove={makeMove} winningLine={winningLine} />
+            </div>
+
+            {/* CPU石表示（盤面右側） */}
+            <div className="flex items-start h-96">
+              <PlayerIndicator 
+                color={cpuColor} 
+                label="CPU" 
+                isCurrentTurn={currentPlayer === cpuColor}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
