@@ -73,7 +73,7 @@ describe("GameResult", () => {
     
     render(<GameResult {...props} />);
     
-    const backToMenuButton = screen.getByText("設定変更");
+    const backToMenuButton = screen.getByLabelText("設定変更");
     await user.click(backToMenuButton);
     
     expect(onBackToMenu).toHaveBeenCalledTimes(1);

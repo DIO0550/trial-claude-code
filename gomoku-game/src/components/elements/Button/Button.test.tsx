@@ -156,4 +156,30 @@ describe("Button", () => {
       expect(button).toHaveAttribute("aria-label", "閉じる");
     });
   });
+
+  describe("アイコンサポート", () => {
+    it("アイコンが表示される", () => {
+      const icon = <span data-testid="test-icon">←</span>;
+      render(<Button icon={icon}>戻る</Button>);
+      
+      expect(screen.getByTestId("test-icon")).toBeInTheDocument();
+      expect(screen.getByText("戻る")).toBeInTheDocument();
+    });
+
+    it("アイコンのみモードでテキストが表示されない", () => {
+      const icon = <span data-testid="test-icon">←</span>;
+      render(<Button icon={icon} iconOnly aria-label="戻る">戻る</Button>);
+      
+      expect(screen.getByTestId("test-icon")).toBeInTheDocument();
+      expect(screen.queryByText("戻る")).not.toBeInTheDocument();
+    });
+
+    it("iconOnlyモードでaria-labelが必須", () => {
+      const icon = <span data-testid="test-icon">←</span>;
+      render(<Button icon={icon} iconOnly aria-label="戻る">戻る</Button>);
+      
+      const button = screen.getByRole("button");
+      expect(button).toHaveAttribute("aria-label", "戻る");
+    });
+  });
 });
