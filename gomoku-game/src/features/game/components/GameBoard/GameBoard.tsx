@@ -1,6 +1,7 @@
 "use client";
 
 import Button from "@/components/elements/Button/Button";
+import BackIcon from "@/components/elements/BackIcon/BackIcon";
 import Board from "@/features/board/components/Board/Board";
 import { GameResult } from "@/features/game/components/GameResult/GameResult";
 import { PlayerIndicator } from "@/features/game/components/PlayerIndicator/PlayerIndicator";
@@ -55,6 +56,9 @@ const GameBoard = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Element
             onClick={onBackToStart}
             variant="secondary"
             size="medium"
+            icon={<BackIcon />}
+            iconOnly
+            aria-label="スタート画面に戻る"
           >
             スタート画面に戻る
           </Button>
