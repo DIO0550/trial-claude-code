@@ -5,6 +5,7 @@ import BackIcon from "@/components/elements/BackIcon/BackIcon";
 import Board from "@/features/board/components/Board/Board";
 import { GameResult } from "@/features/game/components/GameResult/GameResult";
 import { PlayerIndicator } from "@/features/game/components/PlayerIndicator/PlayerIndicator";
+import { UndoButton } from "@/components/game/UndoButton";
 import { useGomokuGame, GameSettings } from "@/features/game/hooks/useGomokuGame";
 import { StoneColor } from "@/features/board/utils/stone";
 import { CpuLevel } from "@/features/cpu/utils/cpuLevel";
@@ -26,7 +27,7 @@ interface Props {
  */
 const GameBoard = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Element => {
   const gameSettings: GameSettings = { playerColor, cpuLevel };
-  const { board, winner, canMakeMove, makeMove, resetGame, winningLine, showResultModal, currentPlayer } = useGomokuGame(gameSettings);
+  const { board, winner, canMakeMove, makeMove, resetGame, winningLine, showResultModal, currentPlayer, canUndo, undoMove } = useGomokuGame(gameSettings);
   
   const cpuLevelLabels = {
     beginner: "入門",
@@ -114,6 +115,15 @@ const GameBoard = ({ cpuLevel, playerColor, onBackToStart }: Props): JSX.Element
                 isCurrentTurn={currentPlayer === cpuColor}
               />
             </div>
+          </div>
+          
+          {/* ゲーム操作ボタン */}
+          <div className="flex justify-center mt-4">
+            <UndoButton 
+              onUndo={undoMove}
+              canUndo={canUndo}
+              disabled={showResultModal}
+            />
           </div>
         </div>
       </div>
