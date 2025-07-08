@@ -29,7 +29,7 @@ export interface UseGomokuGameReturn {
   showResultModal: boolean;
 }
 
-interface GameState {
+export interface GameState {
   gameBoard: GameBoard;
   currentPlayer: StoneColor;
   gameStatus: GameStatus;
@@ -39,8 +39,9 @@ interface GameState {
   showResultModal: boolean;
 }
 
-type GameAction =
+export type GameAction =
   | { type: "MAKE_MOVE"; position: Position }
+  | { type: "UNDO_MOVE" }
   | { type: "SET_WINNER"; winner: StoneColor }
   | { type: "SET_DRAW" }
   | { type: "RESET_GAME" }
