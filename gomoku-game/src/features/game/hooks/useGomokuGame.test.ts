@@ -449,4 +449,161 @@ describe("useGomokuGame", () => {
       expect(result.current.gameStatus).toBe("playing");
     });
   });
+
+  describe("undo機能", () => {
+    it("初期状態ではundo不可", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+      
+      expect(result.current.canUndo).toBe(false);
+    });
+
+    it("1手打った後もundo不可", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+      
+      act(() => {
+        result.current.makeMove(7, 7);
+      });
+
+      expect(result.current.canUndo).toBe(false);
+    });
+
+    it("2手打った後はundo可能", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+      
+      act(() => {
+        result.current.makeMove(7, 7); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 8); // 白
+      });
+
+      expect(result.current.canUndo).toBe(true);
+    });
+
+    it("undoで前の状態に戻る", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+      
+      // 初期状態を記録
+      const initialBoard = result.current.board;
+      const initialPlayer = result.current.currentPlayer;
+      const initialHistory = result.current.moveHistory;
+
+      act(() => {
+        result.current.makeMove(7, 7); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 8); // 白
+      });
+
+      // 変更を確認
+      expect(result.current.board[7][7]).toBe("black");
+      expect(result.current.board[8][8]).toBe("white");
+      expect(result.current.currentPlayer).toBe("black");
+      expect(result.current.moveHistory).toHaveLength(2);
+
+      // undo実行
+      act(() => {
+        result.current.undoMove();
+      });
+
+      // 1手前の状態（白が打つ前の状態、つまり黒が打った後）に戻る
+      expect(result.current.board[7][7]).toBe("black");
+      expect(result.current.board[8][8]).toBe("none");
+      expect(result.current.currentPlayer).toBe("white");
+      expect(result.current.moveHistory).toHaveLength(1);
+    });
+
+    it("複数回undoできる", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+      
+      act(() => {
+        result.current.makeMove(7, 7); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 8); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 8); // 黒
+      });
+
+      expect(result.current.moveHistory).toHaveLength(3);
+      expect(result.current.canUndo).toBe(true);
+
+      // 1回目のundo
+      act(() => {
+        result.current.undoMove();
+      });
+
+      expect(result.current.moveHistory).toHaveLength(2);
+      expect(result.current.board[7][8]).toBe("none");
+      expect(result.current.currentPlayer).toBe("black");
+      expect(result.current.canUndo).toBe(true);
+
+      // 2回目のundo
+      act(() => {
+        result.current.undoMove();
+      });
+
+      expect(result.current.moveHistory).toHaveLength(2); // 元々3手打って、1回undoしたので2手残る
+      expect(result.current.board[8][8]).toBe("white"); // 白石は残っている
+      expect(result.current.currentPlayer).toBe("black"); // 次は黒番
+      expect(result.current.canUndo).toBe(true); // まだ2手あるのでundo可能
+    });
+
+    it("ゲーム終了後はundo不可", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+      
+      // 勝利状態を作成（横に5つ）
+      act(() => {
+        result.current.makeMove(7, 7); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 7); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 8); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 8); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 9); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 9); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 10); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 10); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 11); // 黒 - 勝利
+      });
+
+      expect(result.current.gameStatus).toBe("won");
+      expect(result.current.canUndo).toBe(false);
+    });
+
+    it("resetGame後はundo履歴がクリアされる", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+      
+      act(() => {
+        result.current.makeMove(7, 7); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 8); // 白
+      });
+
+      expect(result.current.canUndo).toBe(true);
+
+      act(() => {
+        result.current.resetGame();
+      });
+
+      expect(result.current.canUndo).toBe(false);
+      expect(result.current.moveHistory).toHaveLength(0);
+    });
+  });
 });
