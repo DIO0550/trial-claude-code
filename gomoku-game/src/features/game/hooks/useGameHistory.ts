@@ -56,10 +56,18 @@ export const useGameHistory = () => {
     return history.length > 1;
   }, [history]);
 
+  /**
+   * 履歴をクリア
+   */
+  const clearHistory = useCallback(() => {
+    setHistory([]);
+  }, []);
+
   return {
     history,
     addToHistory,
     undoLastMove,
     canUndo,
+    clearHistory,
   };
 };
