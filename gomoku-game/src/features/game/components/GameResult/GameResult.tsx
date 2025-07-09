@@ -1,4 +1,6 @@
 import React from "react";
+import Button from "@/components/elements/Button/Button";
+import BackIcon from "@/components/elements/BackIcon/BackIcon";
 import { StoneColor } from "@/features/board/utils/stone";
 
 interface Props {
@@ -49,18 +51,23 @@ export const GameResult = ({ showResult, winner, playerColor, onRestart, onBackT
         </div>
         
         <div className="flex gap-3">
-          <button
+          <Button
             onClick={onRestart}
-            className="px-6 py-3 bg-white text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition-colors shadow-md"
+            variant="primary"
+            className="bg-white text-blue-600 hover:bg-blue-50 shadow-md"
           >
             再戦
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onBackToMenu}
-            className="px-6 py-3 bg-white text-purple-600 font-bold rounded-lg hover:bg-gray-100 transition-colors shadow-md"
+            variant="secondary"
+            icon={<BackIcon />}
+            iconOnly
+            aria-label="設定変更"
+            className="bg-white text-purple-600 hover:bg-gray-100 shadow-md"
           >
             設定変更
-          </button>
+          </Button>
         </div>
       </div>
     </div>

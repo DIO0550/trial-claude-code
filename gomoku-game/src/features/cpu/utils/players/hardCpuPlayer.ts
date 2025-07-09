@@ -106,13 +106,13 @@ const getOpponentColor = (color: StoneColor): StoneColor => {
 const evaluateOffensivePattern = (
   board: Board,
   position: Position,
-  color: StoneColor
+  color: StoneColor,
 ): number => {
   let score = 0;
   const myConsecutiveCounts = calculateConsecutiveCounts(
     board,
     position,
-    color
+    color,
   );
 
   for (let i = 0; i < myConsecutiveCounts.length; i++) {
@@ -146,7 +146,7 @@ const evaluateThreePattern = (
   board: Board,
   position: Position,
   color: StoneColor,
-  direction: (typeof DIRECTIONS)[number]
+  direction: (typeof DIRECTIONS)[number],
 ): number => {
   const tempBoard = Board.placeStone(board, position.row, position.col, color);
 
@@ -155,7 +155,7 @@ const evaluateThreePattern = (
     position.row,
     position.col,
     direction.deltaRow,
-    direction.deltaCol
+    direction.deltaCol,
   )
     ? EVALUATION_SCORES.THREE_OPEN
     : EVALUATION_SCORES.THREE;
@@ -168,7 +168,7 @@ const evaluateTwoPattern = (
   board: Board,
   position: Position,
   color: StoneColor,
-  direction: (typeof DIRECTIONS)[number]
+  direction: (typeof DIRECTIONS)[number],
 ): number => {
   const tempBoard = Board.placeStone(board, position.row, position.col, color);
 
@@ -177,7 +177,7 @@ const evaluateTwoPattern = (
     position.row,
     position.col,
     direction.deltaRow,
-    direction.deltaCol
+    direction.deltaCol,
   )
     ? EVALUATION_SCORES.TWO_OPEN
     : EVALUATION_SCORES.TWO;
@@ -189,13 +189,13 @@ const evaluateTwoPattern = (
 const evaluateDefensivePattern = (
   board: Board,
   position: Position,
-  opponentColor: StoneColor
+  opponentColor: StoneColor,
 ): number => {
   let score = 0;
   const opponentConsecutiveCounts = calculateConsecutiveCounts(
     board,
     position,
-    opponentColor
+    opponentColor,
   );
 
   for (const consecutive of opponentConsecutiveCounts) {
@@ -224,7 +224,7 @@ const evaluateForkThreats = (
   board: Board,
   position: Position,
   color: StoneColor,
-  opponentColor: StoneColor
+  opponentColor: StoneColor,
 ): number => {
   let score = 0;
 
@@ -247,7 +247,7 @@ const evaluateForkThreats = (
 const detectForkThreat = (
   board: Board,
   position: Position,
-  color: StoneColor
+  color: StoneColor,
 ): number => {
   const tempBoard = Board.placeStone(board, position.row, position.col, color);
 
@@ -260,7 +260,7 @@ const detectForkThreat = (
       position.col,
       direction.deltaRow,
       direction.deltaCol,
-      color
+      color,
     );
 
     if (consecutive >= GAME_CONSTANTS.THREE_LENGTH) {
@@ -295,7 +295,7 @@ const evaluatePositionalBonus = (position: Position): number => {
 const evaluateTerritoryControl = (
   board: Board,
   position: Position,
-  color: StoneColor
+  color: StoneColor,
 ): number => {
   let territoryScore = 0;
 
@@ -329,7 +329,7 @@ const evaluateStrategicProximity = (
   board: Board,
   position: Position,
   color: StoneColor,
-  opponentColor: StoneColor
+  opponentColor: StoneColor,
 ): number => {
   let proximityScore = 0;
 
@@ -351,7 +351,8 @@ const evaluateStrategicProximity = (
 
   // 距離2以内で高評価（仕様書に従い距離2以内を重視）
   if (minDistance <= 2) {
-    proximityScore += EVALUATION_SCORES.TERRITORY * (20 - minDistance * 3); // ボーナスを大きく
+    const bonus = EVALUATION_SCORES.WIN / 2; // 勝利手の半分という極めて高いボーナス
+    proximityScore += bonus;
   }
 
   // プレイヤーの連続形成を阻害する位置での近接ボーナス
@@ -359,7 +360,7 @@ const evaluateStrategicProximity = (
     const consecutiveCounts = calculateConsecutiveCounts(
       board,
       playerPos,
-      opponentColor
+      opponentColor,
     );
 
     for (const count of consecutiveCounts) {
@@ -402,7 +403,7 @@ const evaluatePosition = (
   board: Board,
   position: Position,
   color: StoneColor,
-  opponentColor: StoneColor
+  opponentColor: StoneColor,
 ): number => {
   return (
     evaluateOffensivePattern(board, position, color) +
@@ -420,11 +421,11 @@ const evaluatePosition = (
 const findCriticalMove = (
   board: Board,
   color: StoneColor,
-  opponentColor: StoneColor
+  opponentColor: StoneColor,
 ): Position | null => {
   const availablePositions = getAvailablePositions(board);
 
-  // 勝利手をチェック
+  // 1. 勝利手をチェック（最優先）
   for (const position of availablePositions) {
     const myCounts = calculateConsecutiveCounts(board, position, color);
     if (myCounts.some((count) => count >= GAME_CONSTANTS.WIN_LENGTH)) {
@@ -432,15 +433,71 @@ const findCriticalMove = (
     }
   }
 
-  // 相手の勝利阻止手をチェック
+  // 2. 相手の勝利阻止手をチェック
   for (const position of availablePositions) {
     const opponentCounts = calculateConsecutiveCounts(
       board,
       position,
-      opponentColor
+      opponentColor,
     );
     if (opponentCounts.some((count) => count >= GAME_CONSTANTS.WIN_LENGTH)) {
       return position;
+    }
+  }
+
+  // 3. 4連続を作る手をチェック
+  for (const position of availablePositions) {
+    const myCounts = calculateConsecutiveCounts(board, position, color);
+    if (myCounts.some((count) => count >= GAME_CONSTANTS.THREAT_LENGTH)) {
+      return position;
+    }
+  }
+
+  // 4. 相手の4連続を阻止する手をチェック
+  for (const position of availablePositions) {
+    const opponentCounts = calculateConsecutiveCounts(
+      board,
+      position,
+      opponentColor,
+    );
+    if (opponentCounts.some((count) => count >= GAME_CONSTANTS.THREAT_LENGTH)) {
+      return position;
+    }
+  }
+
+  // 5. 相手の3連続（両端開放）を阻止する手をチェック
+  for (const position of availablePositions) {
+    const tempBoard = Board.placeStone(
+      board,
+      position.row,
+      position.col,
+      opponentColor,
+    );
+    for (let i = 0; i < DIRECTIONS.length; i++) {
+      const direction = DIRECTIONS[i];
+      const consecutive = countBidirectionalStones(
+        tempBoard,
+        position.row,
+        position.col,
+        direction.deltaRow,
+        direction.deltaCol,
+        opponentColor,
+      );
+
+      if (consecutive >= GAME_CONSTANTS.THREE_LENGTH) {
+        // 両端が開放されているかチェック
+        if (
+          isPatternOpen(
+            tempBoard,
+            position.row,
+            position.col,
+            direction.deltaRow,
+            direction.deltaCol,
+          )
+        ) {
+          return position;
+        }
+      }
     }
   }
 
@@ -455,7 +512,7 @@ const getSortedCandidates = (
   availablePositions: Position[],
   color: StoneColor,
   opponentColor: StoneColor,
-  maxCount: number
+  maxCount: number,
 ): Position[] => {
   return availablePositions
     .map((pos) => ({
@@ -476,7 +533,7 @@ const minimax = (
   depth: number,
   isMaximizing: boolean,
   alpha: number = -Infinity,
-  beta: number = Infinity
+  beta: number = Infinity,
 ): number => {
   if (depth === 0) {
     return 0;
@@ -491,7 +548,7 @@ const minimax = (
     availablePositions,
     currentColor,
     opponentColor,
-    GAME_CONSTANTS.MINIMAX_MAX_POSITIONS
+    GAME_CONSTANTS.MINIMAX_MAX_POSITIONS,
   );
 
   if (isMaximizing) {
@@ -501,7 +558,7 @@ const minimax = (
         board,
         position.row,
         position.col,
-        currentColor
+        currentColor,
       );
       const evaluation = minimax(
         tempBoard,
@@ -509,7 +566,7 @@ const minimax = (
         depth - 1,
         false,
         alpha,
-        beta
+        beta,
       );
 
       maxEval = Math.max(maxEval, evaluation);
@@ -527,7 +584,7 @@ const minimax = (
         board,
         position.row,
         position.col,
-        currentColor
+        currentColor,
       );
       const evaluation = minimax(
         tempBoard,
@@ -535,7 +592,7 @@ const minimax = (
         depth - 1,
         true,
         alpha,
-        beta
+        beta,
       );
 
       minEval = Math.min(minEval, evaluation);
@@ -555,7 +612,7 @@ const minimax = (
 const selectBestMove = (
   board: Board,
   color: StoneColor,
-  opponentColor: StoneColor
+  opponentColor: StoneColor,
 ): Position => {
   const availablePositions = getAvailablePositions(board);
   let bestPosition = availablePositions[0];
@@ -566,7 +623,7 @@ const selectBestMove = (
       board,
       position,
       color,
-      opponentColor
+      opponentColor,
     );
 
     // 有望な手について3手先読み
@@ -576,13 +633,13 @@ const selectBestMove = (
         board,
         position.row,
         position.col,
-        color
+        color,
       );
       const futureScore = minimax(
         tempBoard,
         color,
         GAME_CONSTANTS.ADVANCED_MINIMAX_DEPTH,
-        false
+        false,
       );
       totalScore =
         positionScore + futureScore * GAME_CONSTANTS.FUTURE_SCORE_WEIGHT;
@@ -617,7 +674,7 @@ export const createHardCpuPlayer = (color: StoneColor): CpuPlayer => {
     color,
     calculateNextMove: (
       board: Board,
-      moveHistory: Position[]
+      moveHistory: Position[],
     ): Position | null => {
       const availablePositions = getAvailablePositions(board);
 
@@ -634,7 +691,7 @@ export const createHardCpuPlayer = (color: StoneColor): CpuPlayer => {
       }
 
       // 2. 序盤定石
-      const openingMove = getOpeningMove(board, moveHistory);
+      const openingMove = getOpeningMove(board, moveHistory, "early");
       if (openingMove) {
         return openingMove;
       }

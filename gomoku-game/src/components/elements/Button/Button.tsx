@@ -7,7 +7,9 @@ type Props = {
   variant?: ButtonVariant;
   size?: ButtonSize;
   fullWidth?: boolean;
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  icon?: React.ReactNode;
+  iconOnly?: boolean;
 } & ButtonHTMLAttributes<HTMLButtonElement>
 
 /**
@@ -17,6 +19,8 @@ type Props = {
  * @param size - ボタンのサイズ（small, medium, large）
  * @param fullWidth - 幅を100%にするかどうか
  * @param children - ボタン内に表示するコンテンツ
+ * @param icon - 表示するアイコン
+ * @param iconOnly - アイコンのみ表示するかどうか
  * @param className - 追加のCSSクラス
  * @param props - その他のHTMLButtonElement属性
  * @returns ボタンコンポーネント
@@ -26,10 +30,12 @@ const Button = ({
   size = "medium",
   fullWidth = false,
   children,
+  icon,
+  iconOnly = false,
   className = "",
   ...props
 }: Props): JSX.Element => {
-  const baseClasses = "font-semibold rounded transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
+  const baseClasses = "font-semibold rounded transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer";
   
   const variantClasses = {
     primary: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500",
@@ -56,7 +62,8 @@ const Button = ({
 
   return (
     <button className={combinedClasses} {...props}>
-      {children}
+      {icon && icon}
+      {!iconOnly && children}
     </button>
   );
 };

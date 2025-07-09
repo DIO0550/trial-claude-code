@@ -7,6 +7,8 @@ import { CpuPlayer } from "@/features/cpu/utils/players/cpuPlayer";
 import { createBeginnerCpuPlayer } from "@/features/cpu/utils/players/beginnerCpuPlayer";
 import { createEasyCpuPlayer } from "@/features/cpu/utils/players/easyCpuPlayer";
 import { createNormalCpuPlayer } from "@/features/cpu/utils/players/normalCpuPlayer";
+import { createHardCpuPlayer } from "@/features/cpu/utils/players/hardCpuPlayer";
+import { createExpertCpuPlayer } from "@/features/cpu/utils/players/expertCpuPlayer";
 
 export interface UseCpuPlayerReturn {
   getNextMove: (board: Board, moveHistory?: Position[]) => Position | null;
@@ -19,7 +21,10 @@ export interface UseCpuPlayerReturn {
  * @param cpuLevel - CPUの難易度レベル
  * @returns CPUプレイヤーの操作メソッド
  */
-export const useCpuPlayer = (cpuColor: StoneColor, cpuLevel: CpuLevel = "easy"): UseCpuPlayerReturn => {
+export const useCpuPlayer = (
+  cpuColor: StoneColor,
+  cpuLevel: CpuLevel = "easy",
+): UseCpuPlayerReturn => {
   const cpuPlayer = useMemo<CpuPlayer>(() => {
     switch (cpuLevel) {
       case "beginner":
@@ -29,19 +34,20 @@ export const useCpuPlayer = (cpuColor: StoneColor, cpuLevel: CpuLevel = "easy"):
       case "normal":
         return createNormalCpuPlayer(cpuColor);
       case "hard":
+        return createHardCpuPlayer(cpuColor);
       case "expert":
-        return createNormalCpuPlayer(cpuColor);
+        return createExpertCpuPlayer(cpuColor);
       default:
         return createEasyCpuPlayer(cpuColor);
     }
   }, [cpuColor, cpuLevel]);
 
-  const getNextMove = useCallback((
-    board: Board, 
-    moveHistory: Position[] = []
-  ): Position | null => {
-    return cpuPlayer.calculateNextMove(board, moveHistory);
-  }, [cpuPlayer]);
+  const getNextMove = useCallback(
+    (board: Board, moveHistory: Position[] = []): Position | null => {
+      return cpuPlayer.calculateNextMove(board, moveHistory);
+    },
+    [cpuPlayer],
+  );
 
   return {
     getNextMove,

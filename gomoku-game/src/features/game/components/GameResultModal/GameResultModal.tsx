@@ -59,13 +59,13 @@ export const GameResultModal = ({
         <div className="flex gap-3 justify-center">
           <button
             onClick={onRestart}
-            className="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors"
+            className="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors cursor-pointer"
           >
             再戦
           </button>
           <button
             onClick={onBackToMenu}
-            className="px-6 py-3 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600 transition-colors"
+            className="px-6 py-3 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600 transition-colors cursor-pointer"
           >
             設定変更
           </button>
