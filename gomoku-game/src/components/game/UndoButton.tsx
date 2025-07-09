@@ -8,7 +8,7 @@ interface UndoButtonProps {
  * 待ったボタンコンポーネント
  * ゲーム中に手番を1つ前に戻すためのボタン
  */
-export const UndoButton = ({ onUndo, canUndo, disabled = false }: UndoButtonProps): JSX.Element => {
+export const UndoButton = ({ onUndo, canUndo, disabled = false }: UndoButtonProps): React.JSX.Element => {
   const isDisabled = !canUndo || disabled;
 
   const handleClick = () => {
