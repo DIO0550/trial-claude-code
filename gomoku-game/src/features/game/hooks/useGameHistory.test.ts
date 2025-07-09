@@ -5,7 +5,7 @@ import { GameBoard } from "@/features/board/utils/gameBoard";
 import type { GameState } from "./useGomokuGame";
 
 describe("useGameHistory", () => {
-  const createTestGameState = (currentPlayer = "black" as const): GameState => ({
+  const createTestGameState = (currentPlayer: "black" | "white" = "black"): GameState => ({
     gameBoard: GameBoard.createEmpty(),
     currentPlayer,
     gameStatus: "playing",
@@ -115,5 +115,105 @@ describe("useGameHistory", () => {
     expect(result.current.history).toHaveLength(20);
     expect(result.current.history[0].moveCount).toBe(1); // 最初の履歴が削除されている
     expect(result.current.history[19].moveCount).toBe(20);
+  });
+
+  describe("undoToPlayerTurn", () => {
+    test("プレイヤーの手番まで正しく戻る", () => {
+      const { result } = renderHook(() => useGameHistory());
+      
+      // プレイヤー（黒）→ CPU（白）→ プレイヤー（黒）→ CPU（白）の順序で履歴追加
+      const state1 = createTestGameState("black");  // 初期状態：黒の手番
+      const state2 = createTestGameState("white");  // 黒が打った後：白の手番
+      const state3 = createTestGameState("black");  // 白が打った後：黒の手番
+      const state4 = createTestGameState("white");  // 黒が打った後：白の手番
+
+      act(() => {
+        result.current.addToHistory(state1);
+        result.current.addToHistory(state2);
+        result.current.addToHistory(state3);
+        result.current.addToHistory(state4);
+      });
+
+      // 黒プレイヤーが待ったをした場合、前の黒の手番（state3）まで戻る
+      let undoResult: GameState | null = null;
+      act(() => {
+        undoResult = result.current.undoToPlayerTurn("black");
+      });
+
+      expect(undoResult).toEqual(state2);
+      expect(result.current.history).toHaveLength(2);
+      expect(result.current.history[1].gameState).toEqual(state2);
+    });
+
+    test("履歴が1つ以下の場合はnullを返す", () => {
+      const { result } = renderHook(() => useGameHistory());
+      
+      // 1つの履歴のみ
+      const state1 = createTestGameState("black");
+      act(() => {
+        result.current.addToHistory(state1);
+      });
+
+      let undoResult: GameState | null = null;
+      act(() => {
+        undoResult = result.current.undoToPlayerTurn("black");
+      });
+
+      expect(undoResult).toBeNull();
+    });
+
+    test("canUndoToPlayerTurnは適切な条件でtrueを返す", () => {
+      const { result } = renderHook(() => useGameHistory());
+      
+      expect(result.current.canUndoToPlayerTurn()).toBe(false);
+
+      // 1つの履歴では不可
+      act(() => {
+        result.current.addToHistory(createTestGameState("black"));  // 初期状態：黒手番
+      });
+      
+      expect(result.current.canUndoToPlayerTurn()).toBe(false);
+
+      // 2つの履歴で可能（プレイヤーが1手打った直後）
+      act(() => {
+        result.current.addToHistory(createTestGameState("white"));  // 黒が打った後：白手番  
+      });
+      
+      expect(result.current.canUndoToPlayerTurn()).toBe(true);
+
+      // 3つの履歴で可能（プレイヤーとCPUが1手ずつ打った状態）
+      act(() => {
+        result.current.addToHistory(createTestGameState("black"));  // 白が打った後：黒手番
+      });
+      
+      expect(result.current.canUndoToPlayerTurn()).toBe(true);
+    });
+
+    test("プレイヤーとCPUが1手ずつ打った場合に初期状態に戻る", () => {
+      const { result } = renderHook(() => useGameHistory());
+      
+      // 初期状態 + プレイヤー1手 + CPU1手 の履歴
+      const initialState = createTestGameState("black");     // 初期状態：黒手番
+      const afterPlayerMove = createTestGameState("white");  // 黒が打った後：白手番
+      const afterCpuMove = createTestGameState("black");     // 白が打った後：黒手番
+
+      act(() => {
+        result.current.addToHistory(initialState);
+        result.current.addToHistory(afterPlayerMove);
+        result.current.addToHistory(afterCpuMove);
+      });
+
+      expect(result.current.canUndoToPlayerTurn()).toBe(true);
+
+      // undo実行
+      let undoResult: GameState | null = null;
+      act(() => {
+        undoResult = result.current.undoToPlayerTurn("black");
+      });
+
+      // 初期状態に戻る（プレイヤーとCPUの両方の手が取り消される）
+      expect(undoResult).toEqual(initialState);
+      expect(result.current.history).toHaveLength(1);
+    });
   });
 });
