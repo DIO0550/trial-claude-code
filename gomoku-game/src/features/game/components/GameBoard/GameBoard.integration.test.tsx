@@ -59,7 +59,7 @@ describe("GameBoard undo機能統合テスト", () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
     });
 
-    const undoButton = screen.getByTestId("undo-button");
+    const undoButton = screen.getByTestId("undo-button") as HTMLButtonElement;
     
     // CPUの手が打たれていればundo可能になるはず
     // ただし、テスト環境によっては時間がかかる場合がある
@@ -72,7 +72,7 @@ describe("GameBoard undo機能統合テスト", () => {
     
     // この時点でundo可能になっているか、少なくとも1手は打たれているはず
     // テストの堅牢性のため、条件付きアサーションを使用
-    const isUndoAvailable = !undoButton.disabled;
+    const isUndoAvailable = !(undoButton as HTMLButtonElement).disabled;
     if (isUndoAvailable) {
       expect(undoButton).not.toBeDisabled();
     } else {
