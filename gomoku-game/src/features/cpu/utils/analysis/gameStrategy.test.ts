@@ -3,7 +3,6 @@ import { getOpeningMove } from "./gameStrategy";
 import { Board } from "@/features/board/utils/board";
 import { Position } from "@/features/board/utils/position";
 
-type GamePhase = 'early' | 'mid' | 'late';
 
 describe("gameStrategy", () => {
   describe("getOpeningMove", () => {

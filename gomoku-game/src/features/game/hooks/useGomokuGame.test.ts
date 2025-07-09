@@ -449,4 +449,234 @@ describe("useGomokuGame", () => {
       expect(result.current.gameStatus).toBe("playing");
     });
   });
+
+  describe("undo機能", () => {
+    it("初期状態ではundo不可", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+      
+      expect(result.current.canUndo).toBe(false);
+    });
+
+    it("1手打った後はundo可能", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+      
+      act(() => {
+        result.current.makeMove(7, 7);
+      });
+
+      expect(result.current.canUndo).toBe(true);
+    });
+
+    it("5手打った後はundo可能", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+      
+      act(() => {
+        result.current.makeMove(7, 7); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 8); // 白
+      });
+      act(() => {
+        result.current.makeMove(9, 9); // 黒
+      });
+      act(() => {
+        result.current.makeMove(10, 10); // 白
+      });
+      act(() => {
+        result.current.makeMove(11, 11); // 黒
+      });
+
+      expect(result.current.canUndo).toBe(true);
+    });
+
+    it("undoでプレイヤーの手番まで戻る", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+      
+      // 5手打つ：黒→白→黒→白→黒
+      act(() => {
+        result.current.makeMove(7, 7); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 8); // 白
+      });
+      act(() => {
+        result.current.makeMove(9, 9); // 黒
+      });
+      act(() => {
+        result.current.makeMove(10, 10); // 白
+      });
+      act(() => {
+        result.current.makeMove(11, 11); // 黒
+      });
+
+      // 変更を確認
+      expect(result.current.board[7][7]).toBe("black");
+      expect(result.current.board[8][8]).toBe("white");
+      expect(result.current.board[9][9]).toBe("black");
+      expect(result.current.board[10][10]).toBe("white");
+      expect(result.current.board[11][11]).toBe("black");
+      expect(result.current.currentPlayer).toBe("white");
+      expect(result.current.moveHistory).toHaveLength(5);
+
+      // undo実行
+      act(() => {
+        result.current.undoMove();
+      });
+
+      // プレイヤー（黒）の前の手番まで戻る（3手目の後）
+      expect(result.current.board[7][7]).toBe("black");   // 最初の黒石は残る
+      expect(result.current.board[8][8]).toBe("white");   // 最初の白石は残る
+      expect(result.current.board[9][9]).toBe("black");   // 2番目の黒石は残る
+      expect(result.current.board[10][10]).toBe("none");  // 2番目の白石は消える
+      expect(result.current.board[11][11]).toBe("none");  // 3番目の黒石は消える
+      expect(result.current.currentPlayer).toBe("white"); // 白の手番
+      expect(result.current.moveHistory).toHaveLength(3); // 3手のみ
+    });
+
+    it("5手打った後に複数回undoできる", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+      
+      // 5手打つ：黒→白→黒→白→黒
+      act(() => {
+        result.current.makeMove(7, 7); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 8); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 8); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 7); // 白
+      });
+      act(() => {
+        result.current.makeMove(9, 9); // 黒
+      });
+
+      expect(result.current.moveHistory).toHaveLength(5);
+      expect(result.current.canUndo).toBe(true);
+
+      // 1回目のundo：プレイヤー（黒）の前の手番まで戻る
+      act(() => {
+        result.current.undoMove();
+      });
+
+      expect(result.current.moveHistory).toHaveLength(3); // 黒→白→黒まで
+      expect(result.current.board[9][9]).toBe("none");   // 最新の黒石は消える
+      expect(result.current.board[8][7]).toBe("none");   // 直前の白石も消える
+      expect(result.current.currentPlayer).toBe("white"); // 白の手番
+      expect(result.current.canUndo).toBe(true);
+
+      // 2回目のundo：さらにプレイヤー（黒）の前の手番まで戻る
+      act(() => {
+        result.current.undoMove();
+      });
+
+      expect(result.current.moveHistory).toHaveLength(1); // 黒の最初の手のみ
+      expect(result.current.board[7][8]).toBe("none");   // 2回目の黒石は消える
+      expect(result.current.board[8][8]).toBe("none");   // 最初の白石も消える
+      expect(result.current.currentPlayer).toBe("white"); // 白の手番
+      expect(result.current.canUndo).toBe(true); // 履歴2つなので戻れる
+    });
+
+    it("ゲーム終了後はundo不可", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+      
+      // 勝利状態を作成（横に5つ）
+      act(() => {
+        result.current.makeMove(7, 7); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 7); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 8); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 8); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 9); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 9); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 10); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 10); // 白
+      });
+      act(() => {
+        result.current.makeMove(7, 11); // 黒 - 勝利
+      });
+
+      expect(result.current.gameStatus).toBe("won");
+      expect(result.current.canUndo).toBe(false);
+    });
+
+    it("resetGame後はundo履歴がクリアされる", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+      
+      // 5手打ってundo可能な状態にする
+      act(() => {
+        result.current.makeMove(7, 7); // 黒
+      });
+      act(() => {
+        result.current.makeMove(8, 8); // 白
+      });
+      act(() => {
+        result.current.makeMove(9, 9); // 黒
+      });
+      act(() => {
+        result.current.makeMove(10, 10); // 白
+      });
+      act(() => {
+        result.current.makeMove(11, 11); // 黒
+      });
+
+      expect(result.current.canUndo).toBe(true);
+
+      act(() => {
+        result.current.resetGame();
+      });
+
+      expect(result.current.canUndo).toBe(false);
+      expect(result.current.moveHistory).toHaveLength(0);
+    });
+
+    it("プレイヤーとCPUが1手ずつ打った後から待った可能", () => {
+      const { result } = renderHook(() => useGomokuGame(defaultSettings));
+      
+      // 初期状態の確認
+      expect(result.current.canUndo).toBe(false);
+
+      // 1手目（プレイヤー）
+      act(() => {
+        result.current.makeMove(7, 7); // 黒プレイヤー
+      });
+
+      // プレイヤーが1手打っただけでも待った可能
+      expect(result.current.canUndo).toBe(true);
+
+      // 2手目（CPU）
+      act(() => {
+        result.current.makeMove(8, 8); // 白CPU
+      });
+
+      // プレイヤーとCPUが1手ずつ打った後は待った可能
+      expect(result.current.canUndo).toBe(true);
+
+      // undo実行
+      act(() => {
+        result.current.undoMove();
+      });
+
+      // 初期状態に戻る（プレイヤーとCPUの両方の石が消える）
+      expect(result.current.board[7][7]).toBe("none");
+      expect(result.current.board[8][8]).toBe("none");
+      expect(result.current.currentPlayer).toBe("black"); // 黒の手番
+      expect(result.current.moveHistory).toHaveLength(0); // 初期状態
+    });
+  });
 });

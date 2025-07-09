@@ -1,5 +1,6 @@
-import { useCallback, useReducer, useEffect } from "react";
+import { useCallback, useReducer, useEffect, useMemo, useRef } from "react";
 import { useCpuPlayer } from "@/features/cpu/hooks/useCpuPlayer";
+import { useGameHistory } from "./useGameHistory";
 import { StoneColor } from "@/features/board/utils/stone";
 import { Board, WinningLine } from "@/features/board/utils/board";
 import { GameBoard } from "@/features/board/utils/gameBoard";
@@ -10,7 +11,7 @@ import { WIN_LENGTH } from "@/features/board/constants/dimensions";
 export type GameStatus = "playing" | "won" | "draw";
 
 export interface GameSettings {
-  playerColor: StoneColor;
+  playerColor: "black" | "white";
   cpuLevel: CpuLevel;
 }
 
@@ -27,9 +28,11 @@ export interface UseGomokuGameReturn {
   canMakeMove: (row: number, col: number) => boolean;
   winningLine: WinningLine | null;
   showResultModal: boolean;
+  canUndo: boolean;
+  undoMove: () => void;
 }
 
-interface GameState {
+export interface GameState {
   gameBoard: GameBoard;
   currentPlayer: StoneColor;
   gameStatus: GameStatus;
@@ -39,8 +42,9 @@ interface GameState {
   showResultModal: boolean;
 }
 
-type GameAction =
+export type GameAction =
   | { type: "MAKE_MOVE"; position: Position }
+  | { type: "UNDO_MOVE"; previousState: GameState }
   | { type: "SET_WINNER"; winner: StoneColor }
   | { type: "SET_DRAW" }
   | { type: "RESET_GAME" }
@@ -48,6 +52,10 @@ type GameAction =
 
 const gameReducer = (state: GameState, action: GameAction): GameState => {
   switch (action.type) {
+    case "UNDO_MOVE": {
+      // 履歴から復元した状態を返す
+      return action.previousState;
+    }
     case "MAKE_MOVE": {
       const { position } = action;
       
@@ -132,8 +140,9 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
 export const useGomokuGame = (settings: GameSettings): UseGomokuGameReturn => {
   const cpuColor = settings.playerColor === "black" ? "white" : "black";
   const { getNextMove } = useCpuPlayer(cpuColor, settings.cpuLevel);
+  const { addToHistory, undoToPlayerTurn, canUndoToPlayerTurn, clearHistory } = useGameHistory();
 
-  const [gameState, dispatch] = useReducer(gameReducer, {
+  const initialState = useMemo((): GameState => ({
     gameBoard: GameBoard.createEmpty(),
     currentPlayer: "black",
     gameStatus: "playing",
@@ -141,7 +150,9 @@ export const useGomokuGame = (settings: GameSettings): UseGomokuGameReturn => {
     moveHistory: [],
     winningLine: null,
     showResultModal: false,
-  });
+  }), []);
+
+  const [gameState, dispatch] = useReducer(gameReducer, initialState);
 
   const isPlayerTurn = gameState.currentPlayer === settings.playerColor;
   const isCpuTurn = gameState.currentPlayer === cpuColor;
@@ -158,6 +169,21 @@ export const useGomokuGame = (settings: GameSettings): UseGomokuGameReturn => {
     gameState.gameStatus,
     gameState.gameBoard,
   ]);
+
+  // ゲーム開始時に初期状態を履歴に追加
+  useEffect(() => {
+    addToHistory(initialState);
+  }, [addToHistory, initialState]); // 初回のみ実行
+
+  // makeMove後に状態を履歴に保存するuseEffect
+  // undoの場合は履歴に追加しない
+  const isUndoRef = useRef(false);
+  useEffect(() => {
+    if (gameState.moveHistory.length > 0 && !isUndoRef.current) {
+      addToHistory(gameState);
+    }
+    isUndoRef.current = false; // リセット
+  }, [gameState.moveHistory.length, gameState, addToHistory]);
 
   useEffect(() => {
     if (
@@ -198,7 +224,21 @@ export const useGomokuGame = (settings: GameSettings): UseGomokuGameReturn => {
 
   const resetGame = useCallback(() => {
     dispatch({ type: "RESET_GAME" });
-  }, []);
+    clearHistory(); // 履歴もクリア
+    addToHistory(initialState); // 初期状態を履歴に追加
+  }, [clearHistory, addToHistory, initialState]);
+
+  const undoMove = useCallback(() => {
+    if (gameState.gameStatus !== "playing") return;
+    if (!canUndoToPlayerTurn()) return;
+
+    // プレイヤーの手番まで戻る
+    const previousState = undoToPlayerTurn(settings.playerColor);
+    if (previousState) {
+      isUndoRef.current = true; // undoフラグを設定
+      dispatch({ type: "UNDO_MOVE", previousState });
+    }
+  }, [gameState.gameStatus, canUndoToPlayerTurn, undoToPlayerTurn, settings.playerColor]);
 
   const canMakeMove = useCallback((row: number, col: number): boolean => {
     return (
@@ -207,6 +247,11 @@ export const useGomokuGame = (settings: GameSettings): UseGomokuGameReturn => {
       GameBoard.canPlaceStone(gameState.gameBoard, row, col)
     );
   }, [gameState.gameStatus, gameState.gameBoard, isPlayerTurn]);
+
+  // undo可能な条件を制限
+  const canUndoMove = useCallback((): boolean => {
+    return gameState.gameStatus === "playing" && canUndoToPlayerTurn();
+  }, [gameState.gameStatus, canUndoToPlayerTurn]);
 
   return {
     board: gameState.gameBoard.board,
@@ -221,5 +266,7 @@ export const useGomokuGame = (settings: GameSettings): UseGomokuGameReturn => {
     canMakeMove,
     winningLine: gameState.winningLine,
     showResultModal: gameState.showResultModal,
+    canUndo: canUndoMove(),
+    undoMove,
   };
 };

@@ -1,7 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { countBidirectionalStones, calculateConsecutiveCounts } from "./boardAnalysis";
 import { Board } from "@/features/board/utils/board";
-import { StoneColor } from "@/features/board/utils/stone";
 import { Position } from "@/features/board/utils/position";
 
 describe("boardAnalysis", () => {

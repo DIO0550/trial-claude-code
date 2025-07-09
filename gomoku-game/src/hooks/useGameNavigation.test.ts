@@ -31,10 +31,10 @@ describe("useGameNavigation", () => {
       expect(mockPush).toHaveBeenCalledWith("/game?cpuLevel=hard&color=white");
     });
 
-    it("境界値：nullの色を指定した場合、blackがデフォルトで設定される", () => {
+    it("境界値：black色を指定した場合、正しく設定される", () => {
       const { result } = renderHook(() => useGameNavigation());
       
-      result.current.navigateToGame("easy", null);
+      result.current.navigateToGame("easy", "black");
       
       expect(mockPush).toHaveBeenCalledWith("/game?cpuLevel=easy&color=black");
     });
