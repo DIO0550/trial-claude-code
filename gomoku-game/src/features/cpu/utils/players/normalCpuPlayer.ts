@@ -3,15 +3,7 @@ import { StoneColor } from "@/features/board/utils/stone";
 import { Board } from "@/features/board/utils/board";
 import { Position } from "@/features/board/utils/position";
 import { BOARD_SIZE } from "@/features/board/constants/dimensions";
-import { countBidirectionalStones, calculateConsecutiveCounts } from "@/features/cpu/utils/analysis/boardAnalysis";
-
-// 方向定数
-const DIRECTIONS = [
-  { deltaRow: 0, deltaCol: 1, name: "horizontal" },
-  { deltaRow: 1, deltaCol: 0, name: "vertical" },
-  { deltaRow: 1, deltaCol: 1, name: "diagonal_right" },
-  { deltaRow: 1, deltaCol: -1, name: "diagonal_left" },
-] as const;
+import { calculateConsecutiveCounts } from "@/features/cpu/utils/analysis/boardAnalysis";
 
 // ゲーム定数
 const GAME_CONSTANTS = {
