@@ -5,7 +5,7 @@ import type { GameState } from "../hooks/useGomokuGame";
 import type { GameHistoryEntry } from "../types/gameHistory";
 
 describe("GameHistoryUtils", () => {
-  const createTestGameState = (currentPlayer = "black" as const): GameState => ({
+  const createTestGameState = (currentPlayer: "black" | "white" = "black"): GameState => ({
     gameBoard: GameBoard.createEmpty(),
     currentPlayer,
     gameStatus: "playing",
