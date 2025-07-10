@@ -54,19 +54,16 @@ export const GameResult = ({ showResult, winner, playerColor, onRestart, onBackT
           <Button
             onClick={onRestart}
             variant="primary"
-            className="bg-white text-blue-600 hover:bg-blue-50 shadow-md"
+            className="!bg-white !text-purple-600 !hover:bg-gray-100 shadow-md border border-purple-600"
           >
             再戦
           </Button>
           <Button
             onClick={onBackToMenu}
             variant="secondary"
-            icon={<BackIcon />}
-            iconOnly
-            aria-label="設定変更"
-            className="bg-white text-purple-600 hover:bg-gray-100 shadow-md"
+            className="bg-white text-purple-600 hover:bg-gray-100 shadow-md border border-purple-600"
           >
-            設定変更
+            設定に戻る
           </Button>
         </div>
       </div>
