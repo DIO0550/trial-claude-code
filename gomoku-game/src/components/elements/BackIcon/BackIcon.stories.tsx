@@ -175,7 +175,7 @@ export const AccessibilityExample: Story = {
           BackIconは適切なaria-labelを自動的に設定します：
         </p>
         <div className="bg-gray-100 p-3 rounded font-mono text-sm">
-          &lt;span aria-label="戻る"&gt;&amp;lt;&lt;/span&gt;
+          &lt;span aria-label=&quot;戻る&quot;&gt;&amp;lt;&lt;/span&gt;
         </div>
         <p className="text-sm text-gray-600">
           スクリーンリーダーで「戻る」として読み上げられます。

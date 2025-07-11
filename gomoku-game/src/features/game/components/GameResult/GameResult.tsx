@@ -1,6 +1,5 @@
 import React from "react";
 import Button from "@/components/elements/Button/Button";
-import BackIcon from "@/components/elements/BackIcon/BackIcon";
 import { StoneColor } from "@/features/board/utils/stone";
 
 interface Props {
